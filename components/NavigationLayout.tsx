@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 
-const Layout = ({ children }: { children: React.ReactNode }) => {
+const NavigationLayout = ({ children }: { children: React.ReactNode }) => {
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
     const toggleSidebar = () => {
@@ -93,4 +93,4 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
     );
 };
 
-export default Layout;
+export default NavigationLayout;
