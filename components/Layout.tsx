@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import {Button} from "@/components/ui/button";
 
 const Layout = ({ children }: { children: React.ReactNode }) => {
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
