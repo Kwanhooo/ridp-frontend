@@ -1,4 +1,4 @@
-// pages/page1.tsx
+// pages/DataDashboard.tsx
 import NavigationLayout from "@/components/NavigationLayout";
 
 const Page1 = () => {
