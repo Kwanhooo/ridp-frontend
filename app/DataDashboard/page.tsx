@@ -8,6 +8,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
+import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 
 const DataDashboard = () => {
     return (
@@ -73,10 +74,18 @@ const DataDashboard = () => {
                     </Select>
                 </div>
             </div>
-            <div className="bg-white rounded-2xl shadow-md flex flex-col flex-grow">
-                <div className="text-center text-xl font-bold py-2">1号墩支座竖向位移</div>
-                <div className="flex-grow bg-gray-200 rounded-b-2xl"></div>
-            </div>
+
+            {/* 替换图表部分为 Card */}
+            <Card className="flex-grow">
+                <CardHeader>
+                    <CardTitle className="text-xl font-bold">
+                        1号墩支座竖向位移
+                    </CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <span>某个折线图</span>
+                </CardContent>
+            </Card>
         </div>
     );
 };
