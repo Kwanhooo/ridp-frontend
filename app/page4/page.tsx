@@ -2,7 +2,7 @@
 import NavigationLayout from "@/components/NavigationLayout";
 
 const Page = () => {
-  return <>Page4</>;
+    return <>Page4</>;
 };
 
 export default Page;

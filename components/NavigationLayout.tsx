@@ -1,9 +1,9 @@
 "use client"
 
-import { useState } from 'react';
+import {useState} from 'react';
 import Link from 'next/link';
 
-const NavigationLayout = ({ children }: { children: React.ReactNode }) => {
+const NavigationLayout = ({children}: { children: React.ReactNode }) => {
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
     const toggleSidebar = () => {
@@ -12,10 +12,10 @@ const NavigationLayout = ({ children }: { children: React.ReactNode }) => {
 
     // 页面数组，包含页面名称和路径
     const pages = [
-        { name: '数据总览', path: '/DataDashboard' },
-        { name: 'Page 2', path: '/page2' },
-        { name: 'Page 3', path: '/page3' },
-        { name: 'Page 4', path: '/page4' },
+        {name: '数据总览', path: '/DataDashboard'},
+        {name: '数据治理', path: '/DataGovernance'},
+        {name: 'Page 3', path: '/page3'},
+        {name: 'Page 4', path: '/page4'},
     ];
 
     return (
@@ -77,7 +77,8 @@ const NavigationLayout = ({ children }: { children: React.ReactNode }) => {
                                         !isSidebarOpen && 'hidden'
                                     }`}
                                 >
-                                    <div className={`hover:bg-gray-800 transition-all px-4 py-1 rounded-lg`}>{page.name}</div>
+                                    <div
+                                        className={`hover:bg-gray-800 transition-all px-4 py-1 rounded-lg`}>{page.name}</div>
                                 </Link>
                             </li>
                         ))}

@@ -3,7 +3,7 @@ import NavigationLayout from '@/components/NavigationLayout';
 
 const Page = () => {
     return (<>
-    Page3</>
+            Page3</>
     );
 };
 
