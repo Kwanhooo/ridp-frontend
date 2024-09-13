@@ -10,13 +10,13 @@ const NavigationLayout = ({ children }: { children: React.ReactNode }) => {
     setIsSidebarOpen(!isSidebarOpen);
   };
 
-  // 页面数组，包含页面名称和路径
-  const pages = [
-    { name: "Page 1", path: "/page1" },
-    { name: "Page 2", path: "/page2" },
-    { name: "Page 3", path: "/page3" },
-    { name: "Page 4", path: "/page4" },
-  ];
+    // 页面数组，包含页面名称和路径
+    const pages = [
+        {name: '数据总览', path: '/DataDashboard'},
+        {name: '数据治理', path: '/DataGovernance'},
+        {name: 'Page 3', path: '/page3'},
+        {name: 'Page 4', path: '/page4'},
+    ];
 
   return (
     <div className="flex h-screen">

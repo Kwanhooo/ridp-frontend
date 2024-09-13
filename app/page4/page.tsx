@@ -2,7 +2,7 @@
 
 
 const Page = () => {
-  return <>Page4</>;
+    return <>Page4</>;
 };
 
 export default Page;
