@@ -10,10 +10,14 @@ import {
 } from "@/components/ui/select";
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 
+const containerStyle = {
+    height: `calc(100% - 76px)`
+};
+
 const DataDashboard = () => {
     return (
         <div className="h-full flex flex-col bg-black">
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 border-b-[1px] border-r-gray-700 p-2 pb-3">
                 {/* 桥梁选择 */}
                 <div className="flex items-start space-x-2 flex-col">
                     <label htmlFor="bridge" className="text-white font-bold px-2">
@@ -76,16 +80,18 @@ const DataDashboard = () => {
             </div>
 
             {/* 替换图表部分为 Card */}
-            <Card className="flex-grow">
-                <CardHeader>
-                    <CardTitle className="text-xl font-bold">
-                        1号墩支座竖向位移
-                    </CardTitle>
-                </CardHeader>
-                <CardContent>
-                    <span>某个折线图</span>
-                </CardContent>
-            </Card>
+            <div className="h-full w-full p-4">
+                <Card className="h-full">
+                    <CardHeader>
+                        <CardTitle className="text-xl font-bold">
+                            1号墩支座竖向位移
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent style={containerStyle}>
+                        <div className="h-full w-full bg-gray-500"></div>
+                    </CardContent>
+                </Card>
+            </div>
         </div>
     );
 };
