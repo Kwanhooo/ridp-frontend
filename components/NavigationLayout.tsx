@@ -14,8 +14,8 @@ const NavigationLayout = ({ children }: { children: React.ReactNode }) => {
     const pages = [
         {name: '数据总览', path: '/DataDashboard'},
         {name: '数据治理', path: '/DataGovernance'},
-        {name: 'Page 3', path: '/page3'},
-        {name: 'Page 4', path: '/page4'},
+        {name: '模型管理', path: '/page3'},
+        {name: '预警监控', path: '/page4'},
     ];
 
   return (
