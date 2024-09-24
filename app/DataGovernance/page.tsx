@@ -206,7 +206,7 @@ const FourChartsPage = () => {
                 <Card className="flex flex-col">
                     <CardHeader>
                         <CardTitle className="text-xl font-bold">
-                            预处理后数据
+                            切割后数据
                         </CardTitle>
                         <CardDescription>
                             <span>{chartData.filename}</span>
