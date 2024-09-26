@@ -1,5 +1,7 @@
-"use client";
+"use client"
 import * as React from "react";
+import { ToastContainer, toast } from "react-toastify";
+import 'react-toastify/dist/ReactToastify.css'; // 引入样式
 import {
     Select,
     SelectContent,
@@ -33,56 +35,21 @@ type ChartData = {
 }
 
 /**
- * API
+ * API 调用
  */
 
 // 获取桥梁列表
-const fetchBridgeList = async (): Promise<BridgeListResponse> => {
-    try {
-        const data: BridgeListResponse = await get<BridgeListResponse>('/bridges');
-        console.log('Bridge Names:', data);
-        return data;
-    } catch (error) {
-        console.error('Error fetching bridge names:', error);
-        throw error;
-    }
-};
+const fetchBridgeList = () => get<BridgeListResponse>('/bridges');
 
 // 获取时间列表
-const fetchTimeList = async (bridge: string): Promise<TimeListResponse> => {
-    try {
-        const data: TimeListResponse = await get<TimeListResponse>('/bridges', { bridge });
-        console.log('Time Names:', data);
-        return data;
-    } catch (error) {
-        console.error('Error fetching time names:', error);
-        throw error;
-    }
-};
+const fetchTimeList = (bridge: string) => get<TimeListResponse>('/bridges', { bridge });
 
 // 获取指标类型列表
-const fetchTypeList = async (): Promise<TypeListResponse> => {
-    try {
-        const data: TypeListResponse = await get<TypeListResponse>('/types');
-        console.log('Types Names:', data);
-        return data;
-    } catch (error) {
-        console.error('Error fetching types names:', error);
-        throw error;
-    }
-};
+const fetchTypeList = () => get<TypeListResponse>('/types');
 
-// 获取按照桥梁、时间、指标获取图表数据
-const fetchChartData = async (bridge: string, time: string, type: string): Promise<ChartDataResponse> => {
-    try {
-        const data: ChartDataResponse = await get<ChartDataResponse>('/mertics', { bridge, time, type });
-        console.log('Chart Data:', data);
-        return data;
-    } catch (error) {
-        console.error('Error fetching Chart Data:', error);
-        throw error;
-    }
-};
+// 获取图表数据
+const fetchChartData = (bridge: string, time: string, type: string) =>
+    get<ChartDataResponse>('/mertics', { bridge, time, type });
 
 /**
  * Data
@@ -104,25 +71,41 @@ const DataDashboard = () => {
     const [selectedType, setSelectedType] = React.useState('' as string);
     const [typeOptions, setTypeOptions] = React.useState([] as string[]);
     const [chartData, setChartData] = React.useState(initialChartData);
+    const [loading, setLoading] = React.useState(false);
+
+    // 弹窗错误提示
+    const showErrorToast = (message: string) => {
+        toast.error(message, {
+            position: 'top-right',
+            autoClose: 5000, // 自动关闭时间
+            hideProgressBar: true, // 隐藏进度条
+        });
+    };
 
     // 选项刷新函数
     const refreshSelectionData = async () => {
+        setLoading(true);
         try {
             setBridgeOptions(await fetchBridgeList());
             setTypeOptions(await fetchTypeList());
         } catch (e) {
-            console.error('选项刷新请求错误', e);
+            showErrorToast('获取选项数据失败，请稍后再试。');
+        } finally {
+            setLoading(false);
         }
     };
 
     React.useEffect(() => {
         const fetchTimeOptions = async () => {
             if (selectedBridge) {
+                setLoading(true);
                 try {
                     const timeList = await fetchTimeList(selectedBridge);
                     setTimeOptions(timeList);
                 } catch (error) {
-                    console.error('获取时间选项错误', error);
+                    showErrorToast('获取时间选项失败，请稍后再试。');
+                } finally {
+                    setLoading(false);
                 }
             } else {
                 setTimeOptions([]); // 清空时间选项
@@ -134,29 +117,35 @@ const DataDashboard = () => {
 
     React.useEffect(() => {
         const refreshChartData = async () => {
-            if (selectedBridge && selectedTime && selectedType) {
-                try {
-                    const data = await fetchChartData(selectedBridge, selectedTime, selectedType);
-                    setChartData({
-                        filename: data.Filename,
-                        file_content: data.FileContent,
-                    });
-                } catch (error) {
-                    console.error('更新图表数据错误', error);
-                }
+            if (!selectedBridge || !selectedTime || !selectedType) return;
+
+            setLoading(true);
+            try {
+                const data = await fetchChartData(selectedBridge, selectedTime, selectedType);
+                setChartData({
+                    filename: data.Filename,
+                    file_content: data.FileContent,
+                });
+            } catch (error) {
+                showErrorToast('更新图表数据失败，请稍后再试。');
+            } finally {
+                setLoading(false);
             }
         };
 
         refreshChartData();
     }, [selectedBridge, selectedTime, selectedType]);
 
-    // 立即获取一次
+    // 页面加载时获取初始选项数据
     React.useEffect(() => {
         refreshSelectionData();
     }, []);
 
     return (
         <div className="h-full flex flex-col bg-black">
+            {/* Toast 容器 */}
+            <ToastContainer />
+
             {/* 顶部选择部分 */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 border-b border-gray-700 p-2 pb-3">
                 {/* 桥梁选择 */}
@@ -225,6 +214,9 @@ const DataDashboard = () => {
                     </Select>
                 </div>
             </div>
+
+            {/* 加载状态 */}
+            {loading && <p className="text-white text-center mt-4">加载中...</p>}
 
             {/* 数据总览卡片 */}
             <div className="h-full w-full p-4">
