@@ -1,258 +1,184 @@
+"use client"
 import * as React from "react";
 import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card";
+import NoHeadLineChart from '@/components/NoHeadLineChart';
+import {
+    Select,
+    SelectContent,
+    SelectGroup,
+    SelectItem,
+    SelectLabel,
+    SelectTrigger,
+    SelectValue
+} from "@/components/ui/select";
+import {ChartData} from "@/types/ChartData";
+import {get} from "@/app/uitils/HttpAxios";
+import {ToastContainer} from "react-toastify";
+import 'react-toastify/dist/ReactToastify.css';
+import {showErrorToast} from "@/app/uitils/toast";
 
-const containerStyle = {
-    height: `calc(100% - 102px)`
+type BridgeListResponse = string[];
+type TimeListResponse = string[];
+type TypeListResponse = string[];
+type RawDataResponse = { Filename: string; FileContent: { time: string; value: number }[]; };
+type ProcessedDataResponse = { data: { time: string, value: number }[]; max_abs: number; status: string; }
+
+const initChartData = {title: "", content: []} as ChartData;
+const containerStyle = {height: `calc(100% - 102px)`};
+const wrapperStyle = {height: `calc(100% - 85px)`};
+
+// 数据获取函数
+const fetchData = async <T, >(url: string, params?: object): Promise<T> => {
+    try {
+        return await get<T>(url, params);
+    } catch (error) {
+        showErrorToast(url + " 获取失败，请稍后再试", error);
+        throw error;
+    }
 };
-import NoHeadLineChart from '@/components/NoHeadLineChart'
-const chartData = {
-    filename: "xxx.csv",
-    file_content: [
-        { time: "2024-04-10 06:19:38.000", value: 0.0027995109558105 },
-        { time: "2024-04-10 06:19:38.001", value: 0.0013256072998046 },
-        { time: "2024-04-10 06:19:38.002", value: -0.000495433807373 },
-        { time: "2024-04-10 06:19:38.003", value: -0.0006523132324218 },
-        { time: "2024-04-10 06:19:38.004", value: 0.001415729522705 },
-        { time: "2024-04-10 06:19:38.005", value: 0.0029530525207519 },
-        { time: "2024-04-10 06:19:38.006", value: 0.0017380714416503 },
-        { time: "2024-04-10 06:19:38.007", value: -0.0003962516784667 },
-        { time: "2024-04-10 06:19:38.008", value: -0.0012845993041992 },
-        { time: "2024-04-10 06:19:38.009", value: 0.0008859634399414 },
-        { time: "2024-04-10 06:19:38.010", value: 0.0026187896728515 },
-        { time: "2024-04-10 06:19:38.011", value: 0.0022416114807128 },
-        { time: "2024-04-10 06:19:38.012", value: 0.0001816749572753 },
-        { time: "2024-04-10 06:19:38.013", value: -0.0015311241149902 },
-        { time: "2024-04-10 06:19:38.014", value: -0.0001072883605957 },
-        { time: "2024-04-10 06:19:38.015", value: 0.0021233558654785 },
-        { time: "2024-04-10 06:19:38.016", value: 0.0023107528686523 },
-        { time: "2024-04-10 06:19:38.017", value: 0.0004267692565917 },
-        { time: "2024-04-10 06:19:38.018", value: -0.0010571479797363 },
-        { time: "2024-04-10 06:19:38.019", value: -0.00000095367431640625 },
-        { time: "2024-04-10 06:19:38.020", value: 0.0019540786743164 },
-        { time: "2024-04-10 06:19:38.021", value: 0.0025243759155273 },
-        { time: "2024-04-10 06:19:38.022", value: 0.0008220672607421 },
-        { time: "2024-04-10 06:19:38.023", value: -0.0009064674377441 },
-        { time: "2024-04-10 06:19:38.024", value: -0.0004072189331054 },
-        { time: "2024-04-10 06:19:38.025", value: 0.0016651153564453 },
-        { time: "2024-04-10 06:19:38.026", value: 0.0026750564575195 },
-        { time: "2024-04-10 06:19:38.027", value: 0.0011372566223144 },
-        { time: "2024-04-10 06:19:38.028", value: -0.0008611679077148 },
-        { time: "2024-04-10 06:19:38.029", value: -0.0005245208740234 },
-        { time: "2024-04-10 06:19:38.030", value: 0.0016498565673828 },
-        { time: "2024-04-10 06:19:38.031", value: 0.002845287322998 },
-        { time: "2024-04-10 06:19:38.032", value: 0.0015201568603515 },
-        { time: "2024-04-10 06:19:38.033", value: -0.0007061958312988 },
-        { time: "2024-04-10 06:19:38.034", value: -0.0009765625 },
-        { time: "2024-04-10 06:19:38.035", value: 0.0012731552124023 },
-        { time: "2024-04-10 06:19:38.036", value: 0.0028433799743652 },
-        { time: "2024-04-10 06:19:38.037", value: 0.0022459030151367 },
-        { time: "2024-04-10 06:19:38.038", value: 0.00006103515625 },
-        { time: "2024-04-10 06:19:38.039", value: -0.0013742446899414 },
-        { time: "2024-04-10 06:19:38.040", value: 0.0005640983581542 },
-        { time: "2024-04-10 06:19:38.041", value: 0.0025477409362792 },
-        { time: "2024-04-10 06:19:38.042", value: 0.0022711753845214 },
-        { time: "2024-04-10 06:19:38.043", value: 0.0002079010009765 },
-        { time: "2024-04-10 06:19:38.044", value: -0.0009903907775878 },
-        { time: "2024-04-10 06:19:38.045", value: 0.0003890991210937 },
-        { time: "2024-04-10 06:19:38.046", value: 0.0024385452270507 },
-        { time: "2024-04-10 06:19:38.047", value: 0.0028905868530273 },
-        { time: "2024-04-10 06:19:38.048", value: 0.0009007453918457 },
-        { time: "2024-04-10 06:19:38.049", value: -0.0011019706726074 },
-        { time: "2024-04-10 06:19:38.050", value: -0.0002970695495605 },
-        { time: "2024-04-10 06:19:38.051", value: 0.002197265625 },
-        { time: "2024-04-10 06:19:38.052", value: 0.0029840469360351 },
-        { time: "2024-04-10 06:19:38.053", value: 0.0013437271118164 },
-        { time: "2024-04-10 06:19:38.054", value: -0.0008468627929687 },
-        { time: "2024-04-10 06:19:38.055", value: -0.0007128715515136 },
-        { time: "2024-04-10 06:19:38.056", value: 0.0015320777893066 },
-        { time: "2024-04-10 06:19:38.057", value: 0.0026483535766601 },
-        { time: "2024-04-10 06:19:38.058", value: 0.0014572143554687 },
-        { time: "2024-04-10 06:19:38.059", value: -0.0006256103515625 },
-        { time: "2024-04-10 06:19:38.060", value: -0.000831127166748 },
-        { time: "2024-04-10 06:19:38.061", value: 0.0013842582702636 },
-        { time: "2024-04-10 06:19:38.062", value: 0.0031023025512695 },
-        { time: "2024-04-10 06:19:38.063", value: 0.0023732185363769 },
-        { time: "2024-04-10 06:19:38.064", value: 0.0003085136413574 },
-        { time: "2024-04-10 06:19:38.065", value: -0.0004620552062988 },
-        { time: "2024-04-10 06:19:38.066", value: 0.0012407302856445 },
-        { time: "2024-04-10 06:19:38.067", value: 0.0030388832092285 },
-        { time: "2024-04-11 06:19:38.068", value: 0.0023179054260253 },
-        { time: "2024-04-11 06:19:38.069", value: -0.0002236366271972 },
-        { time: "2024-04-11 06:19:38.070", value: -0.0012493133544921 },
-        { time: "2024-04-11 06:19:38.071", value: 0.0004305839538574 },
-        { time: "2024-04-11 06:19:38.072", value: 0.0028018951416015 },
-        { time: "2024-04-11 06:19:38.073", value: 0.0028343200683593 },
-        { time: "2024-04-11 06:19:38.074", value: 0.0004491806030273 },
-        { time: "2024-04-11 06:19:38.075", value: -0.0010442733764648 },
-        { time: "2024-04-11 06:19:38.076", value: -0.0002970695495605 },
-        { time: "2024-04-11 06:19:38.077", value: 0.0020985603332519 },
-        { time: "2024-04-11 06:19:38.078", value: 0.0025582313537597 },
-        { time: "2024-04-11 06:19:38.079", value: 0.0006208419799804 },
-        { time: "2024-04-11 06:19:38.080", value: -0.0008959770202636 },
-        { time: "2024-04-11 06:19:38.081", value: -0.0003156661987304 },
-        { time: "2024-04-11 06:19:38.082", value: 0.0019135475158691 },
-        { time: "2024-04-11 06:19:38.083", value: 0.0028142929077148 },
-        { time: "2024-04-11 06:19:38.084", value: 0.0014510154724121 },
-        { time: "2024-04-11 06:19:38.085", value: -0.000955581665039 },
-        { time: "2024-04-11 06:19:38.086", value: -0.0007648468017578 },
-        { time: "2024-04-11 06:19:38.087", value: 0.0013041496276855 },
-        { time: "2024-04-11 06:19:38.088", value: 0.002786636352539 },
-        { time: "2024-04-11 06:19:38.089", value: 0.0018362998962402 },
-        { time: "2024-04-11 06:19:38.090", value: -0.0001792907714843 },
-        { time: "2024-04-11 06:19:38.091", value: -0.0008578300476074 },
-        { time: "2024-04-11 06:19:38.092", value: 0.0009765625 },
-        { time: "2024-04-11 06:19:38.093", value: 0.0029902458190917 },
-        { time: "2024-04-11 06:19:38.094", value: 0.0026164054870605 },
-        { time: "2024-04-11 06:19:38.095", value: 0.0006904602050781 },
-        { time: "2024-04-11 06:19:38.096", value: -0.0007820129394531 },
-        { time: "2024-04-11 06:19:38.097", value: 0.0006732940673828 },
-        { time: "2024-04-11 06:19:38.098", value: 0.00272798538208 },
-        { time: "2024-04-11 06:19:38.099", value: 0.0029568672180175 },
-        { time: "2024-04-11 06:19:38.100", value: 0.0005726814270019 },
-        { time: "2024-04-11 06:19:38.101", value: -0.0009465217590332 },
-        { time: "2024-04-11 06:19:38.102", value: -0.00009059906005859376 },
-        { time: "2024-04-11 06:19:38.103", value: 0.0021333694458007 },
-        { time: "2024-04-11 06:19:38.104", value: 0.0026555061340332 },
-        { time: "2024-04-11 06:19:38.105", value: 0.0008563995361328 },
-        { time: "2024-04-11 06:19:38.106", value: -0.0004439353942871 },
-        { time: "2024-04-11 06:19:38.107", value: 0.0001578330993652 },
-        { time: "2024-04-11 06:19:38.108", value: 0.0022006034851074 },
-        { time: "2024-04-11 06:19:38.109", value: 0.0030460357666015 },
-        { time: "2024-04-11 06:19:38.110", value: 0.0017313957214355 },
-        { time: "2024-04-11 06:19:38.111", value: -0.0006165504455566 },
-        { time: "2024-04-11 06:19:38.112", value: -0.0005521774291992 },
-        { time: "2024-04-11 06:19:38.113", value: 0.0020308494567871 },
-        { time: "2024-04-11 06:19:38.114", value: 0.0029668807983398 },
-        { time: "2024-04-11 06:19:38.115", value: 0.0019540786743164 },
-        { time: "2024-04-11 06:19:38.116", value: -0.0002326965332031 },
-        { time: "2024-04-11 06:19:38.117", value: -0.0005035400390625 },
-        { time: "2024-04-11 06:19:38.118", value: 0.0015935897827148 },
-        { time: "2024-04-11 06:19:38.119", value: 0.0031118392944335 },
-        { time: "2024-04-11 06:19:38.120", value: 0.0024013519287109 },
-        { time: "2024-04-11 06:19:38.121", value: -0.0001387596130371 },
-        { time: "2024-04-11 06:19:38.122", value: -0.0006628036499023 },
-        { time: "2024-04-11 06:19:38.123", value: 0.0010294914245605 },
-        { time: "2024-04-11 06:19:38.124", value: 0.0026931762695312 },
-        { time: "2024-04-11 06:19:38.125", value: 0.0024080276489257 },
-        { time: "2024-04-11 06:19:38.126", value: 0.0002474784851074 },
-        { time: "2024-04-11 06:19:38.127", value: -0.0010933876037597 },
-        { time: "2024-04-11 06:19:38.128", value: 0.0005507469177246 },
-        { time: "2024-04-11 06:19:38.129", value: 0.0023212432861328 },
-        { time: "2024-04-11 06:19:38.130", value: 0.0024023056030273 },
-        { time: "2024-04-11 06:19:38.131", value: 0.00059175491333 },
-        { time: "2024-04-11 06:19:38.132", value: -0.0009651184082031 },
-        { time: "2024-04-11 06:19:38.133", value: 0.00007104873657226562 },
-        { time: "2024-04-11 06:19:38.134", value: 0.0020408630371093 },
-        { time: "2024-04-11 06:19:38.135", value: 0.0025215148925781 },
-        { time: "2024-04-11 06:19:38.136", value: 0.0009641647338867 },
-        { time: "2024-04-11 06:19:38.137", value: -0.0007414817810058 },
-        { time: "2024-04-11 06:19:38.138", value: -0.0002970695495605 },
-        { time: "2024-04-11 06:19:38.139", value: 0.0021686553955078 },
-        { time: "2024-04-11 06:19:38.140", value: 0.0027909278869628 },
-        { time: "2024-04-11 06:19:38.141", value: 0.0012092590332031 },
-        { time: "2024-04-11 06:19:38.142", value: -0.0010342597961425 },
-        { time: "2024-04-11 06:19:38.143", value: -0.000864028930664 },
-        { time: "2024-04-11 06:19:38.144", value: 0.0016379356384277 },
-        { time: "2024-04-11 06:19:38.145", value: 0.0028958320617675 },
-        { time: "2024-04-11 06:19:38.146", value: 0.0020604133605957 },
-        { time: "2024-04-11 06:19:38.147", value: -0.0002956390380859 },
-        { time: "2024-04-11 06:19:38.148", value: -0.0010905265808105 },
-        { time: "2024-04-11 06:19:38.149", value: 0.0008187294006347 },
-        { time: "2024-04-11 06:19:38.150", value: 0.0026588439941406 },
-        { time: "2024-04-11 06:19:38.151", value: 0.0021705627441406 },
-        { time: "2024-04-11 06:19:38.152", value: -0.00002288818359375 },
-        { time: "2024-04-11 06:19:38.153", value: -0.0010871887207031 },
-        { time: "2024-04-11 06:19:38.154", value: 0.0003910064697265 },
-        { time: "2024-04-11 06:19:38.155", value: 0.0026688575744628 },
-        { time: "2024-04-11 06:19:38.156", value: 0.0024614334106445 },
-        { time: "2024-04-11 06:19:38.157", value: 0.0002446174621582 },
-        { time: "2024-04-11 06:19:38.158", value: -0.0010414123535156 },
-        { time: "2024-04-11 06:19:38.159", value: 0.0001730918884277 },
-        { time: "2024-04-11 06:19:38.160", value: 0.0025620460510253 },
-        { time: "2024-04-11 06:19:38.161", value: 0.0029406547546386 },
-        { time: "2024-04-11 06:19:38.162", value: 0.0008764266967773 },
-        { time: "2024-04-11 06:19:38.163", value: -0.0008974075317382 },
-        { time: "2024-04-11 06:19:38.164", value: -0.0002598762512207 },
-        { time: "2024-04-11 06:19:38.165", value: 0.0019898414611816 },
-        { time: "2024-04-11 06:19:38.166", value: 0.0028152465820312 },
-        { time: "2024-04-11 06:19:38.167", value: 0.0015172958374023 },
-        { time: "2024-04-11 06:19:38.168", value: -0.000737190246582 },
-        { time: "2024-04-11 06:19:38.169", value: -0.0006666183471679 },
-        { time: "2024-04-11 06:19:38.170", value: 0.0016908645629882 },
-        { time: "2024-04-11 06:19:38.171", value: 0.0030603408813476 },
-        { time: "2024-04-11 06:19:38.172", value: 0.0019392967224121 },
-    ],
-};
-const FourChartsPage = () => {
+
+const Page = () => {
+    const [selectedBridge, setSelectedBridge] = React.useState('' as string);
+    const [bridgeOptions, setBridgeOptions] = React.useState<string[]>([]);
+    const [selectedTime, setSelectedTime] = React.useState('' as string);
+    const [selectedExtension, setSelectedExtension] = React.useState('');
+    const [timeOptions, setTimeOptions] = React.useState<string[]>([]);
+    const [selectedThreshold, setSelectedThreshold] = React.useState('');
+    const [selectedWindowSize, setSelectedWindowSize] = React.useState('');
+    const [selectedType, setSelectedType] = React.useState('' as string);
+    const [typeOptions, setTypeOptions] = React.useState<string[]>([]);
+    const [rawData, setRawData] = React.useState(initChartData as ChartData);
+    const [cutData, setCutData] = React.useState(initChartData as ChartData);
+    const [filteredData, setFilteredData] = React.useState(initChartData as ChartData);
+    const [processData, setProcessData] = React.useState(initChartData as ChartData);
+
+    const loadData = async () => {
+        if (selectedBridge && selectedTime && selectedType) {
+            await Promise.all([
+                fetchData<RawDataResponse>('/metrics', {
+                    bridge: selectedBridge,
+                    time: selectedTime,
+                    type: selectedType
+                }).then(data => setRawData({title: data.Filename, content: data.FileContent})),
+                fetchData<ProcessedDataResponse>('/cut', {
+                    bridge: selectedBridge,
+                    time: selectedTime,
+                    type: selectedType,
+                    Parameters: JSON.stringify({threshold: selectedThreshold})
+                }).then(data => setCutData({title: data.max_abs, content: data.data})),
+                fetchData<ProcessedDataResponse>('/filter', {
+                    bridge: selectedBridge,
+                    time: selectedTime,
+                    type: selectedType,
+                    Parameters: JSON.stringify({window_size: selectedWindowSize})
+                }).then(data => setFilteredData({title: data.max_abs, content: data.data})),
+                fetchData<ProcessedDataResponse>('/process', {
+                    bridge: selectedBridge,
+                    time: selectedTime,
+                    type: selectedType
+                }).then(data => setProcessData({title: data.max_abs, content: data.data})),
+            ]);
+        }
+    };
+
+    React.useEffect(() => {
+        const loadOptions = async () => {
+            try {
+                const bridges = await fetchData<BridgeListResponse>('/bridges', {});
+                const types = await fetchData<TypeListResponse>('/types', {});
+                setBridgeOptions(bridges);
+                setTypeOptions(types);
+                if (bridges.length > 0) setSelectedBridge(bridges[0]);
+                if (types.length > 0) setSelectedType(types[0]);
+            } catch (error) {
+            }
+        };
+
+        loadOptions();
+    }, []);
+
+    React.useEffect(() => {
+        if (selectedBridge) {
+            fetchData<TimeListResponse>('/bridges', {bridge: selectedBridge}).then(times => {
+                setTimeOptions(times);
+                if (times.length > 0) setSelectedTime(times[0]);
+            });
+        }
+    }, [selectedBridge]);
+
+    React.useEffect(() => {
+        loadData();
+    }, [selectedBridge, selectedTime, selectedType]);
+
     return (
-        <div className="h-full bg-black p-4">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 h-full">
-                <Card className="flex flex-col">
-                    <CardHeader>
-                        <CardTitle className="text-xl font-bold">
-                            原始数据
-                        </CardTitle>
-                        <CardDescription>
-                            <span>{chartData.filename}</span>
-                        </CardDescription>
-                    </CardHeader>
-                    <CardContent style={containerStyle}>
-                        <div className="h-full w-full">
-                            <NoHeadLineChart data={chartData}></NoHeadLineChart>
-                        </div>
-                    </CardContent>
-                </Card>
-
-                <Card className="flex flex-col">
-                    <CardHeader>
-                        <CardTitle className="text-xl font-bold">
-                            预处理后数据
-                        </CardTitle>
-                        <CardDescription>
-                            <span>{chartData.filename}</span>
-                        </CardDescription>
-                    </CardHeader>
-                    <CardContent style={containerStyle}>
-                        <div className="h-full w-full">
-                            <NoHeadLineChart data={chartData}></NoHeadLineChart>
-                        </div>
-                    </CardContent>
-                </Card>
-
-                <Card className="flex flex-col">
-                    <CardHeader>
-                        <CardTitle className="text-xl font-bold">
-                            平滑后数据
-                        </CardTitle>
-                        <CardDescription>
-                            <span>{chartData.filename}</span>
-                        </CardDescription>
-                    </CardHeader>
-                    <CardContent style={containerStyle}>
-                        <div className="h-full w-full">
-                            <NoHeadLineChart data={chartData}></NoHeadLineChart>
-                        </div>
-                    </CardContent>
-                </Card>
-
-                <Card className="flex flex-col">
-                    <CardHeader>
-                        <CardTitle className="text-xl font-bold">
-                            多模态数据
-                        </CardTitle>
-                        <CardDescription>
-                            <span>{chartData.filename}</span>
-                        </CardDescription>
-                    </CardHeader>
-                    <CardContent style={containerStyle}>
-                        <div className="h-full w-full">
-                            <NoHeadLineChart data={chartData}></NoHeadLineChart>
-                        </div>
-                    </CardContent>
-                </Card>
+        <div className="h-full bg-black">
+            <ToastContainer/>
+            <div className="grid grid-cols-1 sm:grid-cols-6 gap-4 p-2 pb-3 border-b-[1px] border-gray-600">
+                {/* 选择器组件 */}
+                {[
+                    {label: "桥梁", options: bridgeOptions, value: selectedBridge, setter: setSelectedBridge},
+                    {label: "时间", options: timeOptions, value: selectedTime, setter: setSelectedTime},
+                    {label: "指标", options: typeOptions, value: selectedType, setter: setSelectedType},
+                    {
+                        label: "阈值",
+                        options: ["0.1", "0.01", "0.001"],
+                        value: selectedThreshold,
+                        setter: setSelectedThreshold
+                    },
+                    {
+                        label: "窗口大小",
+                        options: ["0.05", "0.005"],
+                        value: selectedWindowSize,
+                        setter: setSelectedWindowSize
+                    },
+                    {
+                        label: "扩展",
+                        options: ["0.05", "0.005"],
+                        value: selectedExtension,
+                        setter: setSelectedExtension
+                    }
+                ].map(({label, options, setter}) => (
+                    <div className="flex items-start flex-col" key={label}>
+                        <label className="text-white font-bold px-2">{label}</label>
+                        <Select onValueChange={setter}>
+                            <SelectTrigger className="w-[180px] text-white">
+                                <SelectValue placeholder={`选择${label}`}/>
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectGroup>
+                                    <SelectLabel>{`${label}列表`}</SelectLabel>
+                                    {options.map(option => (
+                                        <SelectItem key={option} value={option}>{option}</SelectItem>
+                                    ))}
+                                </SelectGroup>
+                            </SelectContent>
+                        </Select>
+                    </div>
+                ))}
+            </div>
+            <div className="p-4 grid grid-cols-1 sm:grid-cols-2 gap-6" style={wrapperStyle}>
+                {[rawData, cutData, filteredData, processData].map((data, index) => (
+                    <Card className="flex flex-col" key={index}>
+                        <CardHeader>
+                            <CardTitle
+                                className="text-xl font-bold">{["原始数据", "切割后数据", "平滑后数据", "多模态数据"][index]}</CardTitle>
+                            <CardDescription><span>{data.title}</span></CardDescription>
+                        </CardHeader>
+                        <CardContent style={containerStyle}>
+                            <div className="h-full w-full flex justify-center items-center">
+                                {data.content.length > 0 && <NoHeadLineChart data={data}/>}
+                                {data.content.length === 0 && (
+                                    <div className="text-red-800 text-2xl font-bold">
+                                        暂无数据
+                                    </div>
+                                )}
+                            </div>
+                        </CardContent>
+                    </Card>
+                ))}
             </div>
         </div>
     );
 };
 
-export default FourChartsPage;
+export default Page;
