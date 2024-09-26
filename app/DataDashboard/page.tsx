@@ -1,6 +1,6 @@
 "use client"
 import * as React from "react";
-import { ToastContainer, toast } from "react-toastify";
+import {ToastContainer} from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css'; // 引入样式
 import {
     Select,
@@ -11,9 +11,12 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card";
 import NoHeadLineChart from '@/components/NoHeadLineChart';
-import { get } from "@/app/uitils/HttpAxios";
+import {get} from "@/app/uitils/HttpAxios";
+import Spinner from "@/components/Spinner";
+import {ChartData} from "@/types/ChartData";
+import {showErrorToast} from "@/app/uitils/toast";
 
 /**
  * 类型定义
@@ -23,16 +26,10 @@ import { get } from "@/app/uitils/HttpAxios";
 type BridgeListResponse = string[];
 type TypeListResponse = string[];
 type TimeListResponse = string[];
-type ChartDataResponse = {
+type MetricsResponse = {
     Filename: string;
     FileContent: { time: string; value: number }[];
 };
-
-// 数据
-type ChartData = {
-    filename: string;
-    file_content: { time: string; value: number }[];
-}
 
 /**
  * API 调用
@@ -42,25 +39,25 @@ type ChartData = {
 const fetchBridgeList = () => get<BridgeListResponse>('/bridges');
 
 // 获取时间列表
-const fetchTimeList = (bridge: string) => get<TimeListResponse>('/bridges', { bridge });
+const fetchTimeList = (bridge: string) => get<TimeListResponse>('/bridges', {bridge});
 
 // 获取指标类型列表
 const fetchTypeList = () => get<TypeListResponse>('/types');
 
 // 获取图表数据
 const fetchChartData = (bridge: string, time: string, type: string) =>
-    get<ChartDataResponse>('/mertics', { bridge, time, type });
+    get<MetricsResponse>('/metrics', {bridge, time, type});
 
 /**
  * Data
  */
 const containerStyle = {
-    height: `calc(100% - 106px)`
+    height: `calc(100% - 86px)`
 };
 
 const initialChartData = {
-    filename: "",
-    file_content: [],
+    title: "",
+    content: [],
 } as ChartData;
 
 const DataDashboard = () => {
@@ -73,23 +70,25 @@ const DataDashboard = () => {
     const [chartData, setChartData] = React.useState(initialChartData);
     const [loading, setLoading] = React.useState(false);
 
-    // 弹窗错误提示
-    const showErrorToast = (message: string) => {
-        toast.error(message, {
-            position: 'top-right',
-            autoClose: 5000, // 自动关闭时间
-            hideProgressBar: true, // 隐藏进度条
-        });
-    };
-
     // 选项刷新函数
     const refreshSelectionData = async () => {
         setLoading(true);
         try {
-            setBridgeOptions(await fetchBridgeList());
-            setTypeOptions(await fetchTypeList());
+            const bridges = await fetchBridgeList();
+            const types = await fetchTypeList();
+
+            setBridgeOptions(bridges);
+            setTypeOptions(types);
+
+            // 如果没有选择的桥梁或指标，默认选第一个
+            if (bridges.length > 0 && !selectedBridge) {
+                setSelectedBridge(bridges[0]);
+            }
+            if (types.length > 0 && !selectedType) {
+                setSelectedType(types[0]);
+            }
         } catch (e) {
-            showErrorToast('获取选项数据失败，请稍后再试。');
+            showErrorToast('获取选项数据失败，请稍后再试', e);
         } finally {
             setLoading(false);
         }
@@ -102,8 +101,13 @@ const DataDashboard = () => {
                 try {
                     const timeList = await fetchTimeList(selectedBridge);
                     setTimeOptions(timeList);
+
+                    // 默认选择第一个时间
+                    if (timeList.length > 0) {
+                        setSelectedTime(timeList[0]);
+                    }
                 } catch (error) {
-                    showErrorToast('获取时间选项失败，请稍后再试。');
+                    showErrorToast('获取时间选项失败，请稍后再试', error);
                 } finally {
                     setLoading(false);
                 }
@@ -123,11 +127,11 @@ const DataDashboard = () => {
             try {
                 const data = await fetchChartData(selectedBridge, selectedTime, selectedType);
                 setChartData({
-                    filename: data.Filename,
-                    file_content: data.FileContent,
+                    title: data.Filename,
+                    content: data.FileContent,
                 });
             } catch (error) {
-                showErrorToast('更新图表数据失败，请稍后再试。');
+                showErrorToast('更新图表数据失败，请稍后再试。', error);
             } finally {
                 setLoading(false);
             }
@@ -144,7 +148,7 @@ const DataDashboard = () => {
     return (
         <div className="h-full flex flex-col bg-black">
             {/* Toast 容器 */}
-            <ToastContainer />
+            <ToastContainer/>
 
             {/* 顶部选择部分 */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 border-b border-gray-700 p-2 pb-3">
@@ -155,7 +159,7 @@ const DataDashboard = () => {
                     </label>
                     <Select onValueChange={(value) => setSelectedBridge(value)}>
                         <SelectTrigger className="w-[250px] text-white">
-                            <SelectValue placeholder="选择桥梁" />
+                            <SelectValue placeholder="选择桥梁"/>
                         </SelectTrigger>
                         <SelectContent>
                             <SelectGroup>
@@ -177,7 +181,7 @@ const DataDashboard = () => {
                     </label>
                     <Select onValueChange={(value) => setSelectedTime(value)}>
                         <SelectTrigger className="w-[250px] text-white">
-                            <SelectValue placeholder="选择时间" />
+                            <SelectValue placeholder="选择时间"/>
                         </SelectTrigger>
                         <SelectContent>
                             <SelectGroup>
@@ -199,7 +203,7 @@ const DataDashboard = () => {
                     </label>
                     <Select onValueChange={(value) => setSelectedType(value)}>
                         <SelectTrigger className="w-[250px] text-white">
-                            <SelectValue placeholder="选择指标" />
+                            <SelectValue placeholder="选择指标"/>
                         </SelectTrigger>
                         <SelectContent>
                             <SelectGroup>
@@ -215,19 +219,21 @@ const DataDashboard = () => {
                 </div>
             </div>
 
-            {/* 加载状态 */}
-            {loading && <p className="text-white text-center mt-4">加载中...</p>}
-
             {/* 数据总览卡片 */}
             <div className="h-full w-full p-4">
                 <Card className="h-full">
                     <CardHeader>
                         <CardTitle className="text-2xl font-bold">数据总览</CardTitle>
-                        <CardDescription>{chartData.filename}</CardDescription>
+                        <CardDescription>{chartData.title}</CardDescription>
                     </CardHeader>
                     <CardContent style={containerStyle}>
-                        <div className="h-full w-full">
-                            <NoHeadLineChart data={chartData} />
+                        <div className="h-full w-full flex justify-center items-center">
+                            {/* 加载状态 */}
+                            {loading && <div className="flex justify-center"><Spinner/></div>}
+                            {!loading && chartData.content.length === 0 && (
+                                <div className="text-red-800 text-2xl font-bold">暂无数据</div>
+                            )}
+                            {!loading && chartData.content.length > 0 && <NoHeadLineChart data={chartData}/>}
                         </div>
                     </CardContent>
                 </Card>
