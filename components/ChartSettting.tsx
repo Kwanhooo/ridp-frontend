@@ -22,28 +22,29 @@ interface SelectOption {
 
 export default function ChartSetting({ selects, submit }: SelectOption) {
   return (
-    <div className="flex flex-row space-x-2">
+    <div className="grid grid-cols-1 sm:grid-cols-6 gap-4 p-1">
       {selects.map((x) => (
-        <Select
-          key={x.label}
-          value={x.defaultValue}
-          onValueChange={(value) => {
-            submit();
-            x.onChange(value);
-          }}
-        >
-          <Label htmlFor={x.label}>{x.label}</Label>
-          <SelectTrigger id={x.label}>
-            <SelectValue placeholder="选择指标" />
-          </SelectTrigger>
-          <SelectContent position="popper">
-            {x.options.map((option) => (
-              <SelectItem value={option} key={option}>
-                {option}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <div key={x.label}>
+          <Select
+            value={x.defaultValue}
+            onValueChange={(value) => {
+              submit();
+              x.onChange(value);
+            }}
+          >
+            <Label htmlFor={x.label}>{x.label}</Label>
+            <SelectTrigger id={x.label}>
+              <SelectValue placeholder="选择指标" />
+            </SelectTrigger>
+            <SelectContent position="popper">
+              {x.options.map((option) => (
+                <SelectItem value={option} key={option}>
+                  {option}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
       ))}
     </div>
   );

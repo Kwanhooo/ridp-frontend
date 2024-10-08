@@ -1,18 +1,10 @@
 // pages/page3.tsx
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState } from "react";
 
 import MyLineChart from "@/components/LineChart";
 import ChartSetting from "@/components/ChartSettting";
-
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 
 const chartData = {
   filename: "xxx.csv",
@@ -150,7 +142,7 @@ const chartData = {
     { time: "2024-04-10 06:19:38.130", value: 0.0024023056030273 },
     { time: "2024-04-10 06:19:38.131", value: 0.00059175491333 },
     { time: "2024-04-10 06:19:38.132", value: -0.0009651184082031 },
-    { time: "2024-04-10 06:19:38.133", value: 0.00007104873657226562 },
+    { time: "2024-04-10 06:19:38.133", value: 0.007104873657226562 },
     { time: "2024-04-10 06:19:38.134", value: 0.0020408630371093 },
     { time: "2024-04-10 06:19:38.135", value: 0.0025215148925781 },
     { time: "2024-04-10 06:19:38.136", value: 0.0009641647338867 },
@@ -241,12 +233,12 @@ const Page = () => {
   ];
 
   return (
-    <div className="flex flex-col h-full">
-      <div className="h-1/6 p-2 border-b transition-all duration-300 border-gray-700">
+    <div className="flex flex-col h-screen">
+      <div className="h-1/8 p-2 border-b border-gray-700">
         <ChartSetting
           selects={selects}
           submit={() => {
-            let request = {
+            const request = {
               bridge: selectedBridge,
               time: selectedTime,
               metric: selectedMetric,
@@ -260,7 +252,7 @@ const Page = () => {
         />
       </div>
 
-      <div className="h-full p-2 w-full space-y-2">
+      <div className="flex flex-col h-7/8 p-2 w-full space-y-2">
         <div className="h-1/2">
           <MyLineChart data={chartData} title="原始数据"></MyLineChart>
         </div>
