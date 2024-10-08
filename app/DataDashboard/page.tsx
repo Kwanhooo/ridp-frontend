@@ -39,7 +39,7 @@ type MetricsResponse = {
 const fetchBridgeList = () => get<BridgeListResponse>('/bridges');
 
 // 获取时间列表
-const fetchTimeList = (bridge: string) => get<TimeListResponse>('/bridges', {bridge});
+const fetchTimeList = (bridge: string) => get<TimeListResponse>('/times', {bridge});
 
 // 获取指标类型列表
 const fetchTypeList = () => get<TypeListResponse>('/types');
@@ -126,9 +126,10 @@ const DataDashboard = () => {
             setLoading(true);
             try {
                 const data = await fetchChartData(selectedBridge, selectedTime, selectedType);
+                console.log('hello!!!')
                 setChartData({
                     title: data.Filename,
-                    content: data.FileContent,
+                    content: JSON.parse(data.FileContent),
                 });
             } catch (error) {
                 showErrorToast('更新图表数据失败，请稍后再试。', error);
