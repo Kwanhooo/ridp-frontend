@@ -80,13 +80,13 @@ const DataDashboard = () => {
             setBridgeOptions(bridges);
             setTypeOptions(types);
 
-            // 如果没有选择的桥梁或指标，默认选第一个
-            if (bridges.length > 0 && !selectedBridge) {
-                setSelectedBridge(bridges[0]);
-            }
-            if (types.length > 0 && !selectedType) {
-                setSelectedType(types[0]);
-            }
+            // // 如果没有选择的桥梁或指标，默认选第一个
+            // if (bridges.length > 0 && !selectedBridge) {
+            //     setSelectedBridge(bridges[0]);
+            // }
+            // if (types.length > 0 && !selectedType) {
+            //     setSelectedType(types[0]);
+            // }
         } catch (e) {
             showErrorToast('获取选项数据失败，请稍后再试', e);
         } finally {
@@ -102,10 +102,10 @@ const DataDashboard = () => {
                     const timeList = await fetchTimeList(selectedBridge);
                     setTimeOptions(timeList);
 
-                    // 默认选择第一个时间
-                    if (timeList.length > 0) {
-                        setSelectedTime(timeList[0]);
-                    }
+                    // // 默认选择第一个时间
+                    // if (timeList.length > 0) {
+                    //     setSelectedTime(timeList[0]);
+                    // }
                 } catch (error) {
                     showErrorToast('获取时间选项失败，请稍后再试', error);
                 } finally {
