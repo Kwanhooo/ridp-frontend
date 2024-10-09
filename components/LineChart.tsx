@@ -2,7 +2,6 @@
 
 import {
   CartesianGrid,
-  LabelList,
   Line,
   LineChart,
   XAxis,
@@ -13,7 +12,6 @@ import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -51,7 +49,7 @@ export default function MyLineChart({ title, data }: Data) {
     () => ({
       value: data.file_content.reduce((acc, curr) => acc + curr.value, 0),
     }),
-    []
+    [data.file_content]
   );
 
   return (
