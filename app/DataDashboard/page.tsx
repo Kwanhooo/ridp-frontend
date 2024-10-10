@@ -27,8 +27,8 @@ type BridgeListResponse = string[];
 type TypeListResponse = string[];
 type TimeListResponse = string[];
 type MetricsResponse = {
-    Filename: string;
-    FileContent: { time: string; value: number }[];
+    FileName: string;
+    FileContent: string;
 };
 
 /**
@@ -52,7 +52,7 @@ const fetchChartData = (bridge: string, time: string, type: string) =>
  * Data
  */
 const containerStyle = {
-    height: `calc(100% - 86px)`
+    height: `calc(100% - 106px)`
 };
 
 const initialChartData = {
@@ -126,9 +126,8 @@ const DataDashboard = () => {
             setLoading(true);
             try {
                 const data = await fetchChartData(selectedBridge, selectedTime, selectedType);
-                console.log('hello!!!')
                 setChartData({
-                    title: data.Filename,
+                    title: data.FileName,
                     content: JSON.parse(data.FileContent),
                 });
             } catch (error) {
@@ -225,7 +224,7 @@ const DataDashboard = () => {
                 <Card className="h-full">
                     <CardHeader>
                         <CardTitle className="text-2xl font-bold">数据总览</CardTitle>
-                        <CardDescription>{chartData.title}</CardDescription>
+                        <CardDescription>{chartData.title ? ("数据源：" + chartData.title) : "暂无数据"}</CardDescription>
                     </CardHeader>
                     <CardContent style={containerStyle}>
                         <div className="h-full w-full flex justify-center items-center">
