@@ -1,8 +1,9 @@
 import axios, { AxiosInstance, AxiosResponse, AxiosError } from "axios";
 
 const instance: AxiosInstance = axios.create({
-  baseURL: "http://localhost:5555/api/ridp", // 你的 API 基础 URL
-  timeout: 10000, // 请求超时时间
+  // baseURL: "http://localhost:5555/api/ridp", // 你的 API 基础 URL
+  baseURL: "https://api.ridp.0xcafebabe.cn/api/ridp",
+  timeout: 100000, // 请求超时时间
   headers: {
     // 请求头
     "Content-Type": "application/json",
