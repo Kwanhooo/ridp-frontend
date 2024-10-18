@@ -26,7 +26,7 @@ type ProcessedDataResponse = { data: { time: string, value: number }[]; max_abs:
 type CleanDataResponse = { result: { [key: string]: string | boolean }; status: string };
 
 const initChartData = {title: "", content: []} as ChartData;
-const containerStyle = {height: 'calc(100% - 102px)', minHeight: '0'};
+const containerStyle = {height: 'calc(100% - 102px)', maxHeight: '300px'};
 const wrapperStyle = {height: 'calc(100% - 85px)', minHeight: '300px'};
 
 // 数据获取函数
