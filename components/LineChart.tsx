@@ -16,7 +16,7 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 type OriginalChartData = {
   title: string;
@@ -144,10 +144,13 @@ export function HandledLineChart({
       time: string;
       value: number;
     }[]
-  >(cutData.data);
+  >([]);
 
+  useEffect(() => {
+    setSelectedData(cutData.data);
+  }, [cutData.data]);
+  console.log(cutData.data);
   console.log(selectedData);
-  console.log(chartConfig[activeChart].color);
 
   return (
     <Card className="h-full">
@@ -226,7 +229,6 @@ export function HandledLineChart({
             <Line
               dataKey="value"
               type="monotone"
-              // stroke={`var(--color-${activeChart})`}
               stroke={chartConfig[activeChart].color}
               strokeWidth={2}
               dot={false}
