@@ -27,8 +27,8 @@ type BridgeListResponse = string[];
 type TypeListResponse = string[];
 type TimeListResponse = string[];
 type MetricsResponse = {
-    Filename: string;
-    FileContent: { time: string; value: number }[];
+    FileName: string;
+    FileContent: string;
 };
 
 /**
@@ -52,7 +52,7 @@ const fetchChartData = (bridge: string, time: string, type: string) =>
  * Data
  */
 const containerStyle = {
-    height: `calc(100% - 86px)`
+    height: `calc(100% - 106px)`
 };
 
 const initialChartData = {
@@ -80,13 +80,13 @@ const DataDashboard = () => {
             setBridgeOptions(bridges);
             setTypeOptions(types);
 
-            // 如果没有选择的桥梁或指标，默认选第一个
-            if (bridges.length > 0 && !selectedBridge) {
-                setSelectedBridge(bridges[0]);
-            }
-            if (types.length > 0 && !selectedType) {
-                setSelectedType(types[0]);
-            }
+            // // 如果没有选择的桥梁或指标，默认选第一个
+            // if (bridges.length > 0 && !selectedBridge) {
+            //     setSelectedBridge(bridges[0]);
+            // }
+            // if (types.length > 0 && !selectedType) {
+            //     setSelectedType(types[0]);
+            // }
         } catch (e) {
             showErrorToast('获取选项数据失败，请稍后再试', e);
         } finally {
@@ -102,10 +102,10 @@ const DataDashboard = () => {
                     const timeList = await fetchTimeList(selectedBridge);
                     setTimeOptions(timeList);
 
-                    // 默认选择第一个时间
-                    if (timeList.length > 0) {
-                        setSelectedTime(timeList[0]);
-                    }
+                    // // 默认选择第一个时间
+                    // if (timeList.length > 0) {
+                    //     setSelectedTime(timeList[0]);
+                    // }
                 } catch (error) {
                     showErrorToast('获取时间选项失败，请稍后再试', error);
                 } finally {
@@ -126,9 +126,8 @@ const DataDashboard = () => {
             setLoading(true);
             try {
                 const data = await fetchChartData(selectedBridge, selectedTime, selectedType);
-                console.log('hello!!!')
                 setChartData({
-                    title: data.Filename,
+                    title: data.FileName,
                     content: JSON.parse(data.FileContent),
                 });
             } catch (error) {
@@ -225,7 +224,7 @@ const DataDashboard = () => {
                 <Card className="h-full">
                     <CardHeader>
                         <CardTitle className="text-2xl font-bold">数据总览</CardTitle>
-                        <CardDescription>{chartData.title}</CardDescription>
+                        <CardDescription>{chartData.title ? ("数据源：" + chartData.title) : "暂无数据"}</CardDescription>
                     </CardHeader>
                     <CardContent style={containerStyle}>
                         <div className="h-full w-full flex justify-center items-center">
