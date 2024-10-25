@@ -17,7 +17,8 @@ const NavigationLayout = ({ children }: { children: React.ReactNode }) => {
 
   // 页面数组，包含页面名称和路径
   const pages = [
-    { name: "数据总览", path: "/DataDashboard" },
+    { name: "数据大屏", path: "DataBigScreen" },
+    { name: "数据查询", path: "/DataDashboard" },
     { name: "数据治理", path: "/DataGovernance" },
     { name: "模型管理", path: "/ModelManagement" },
     { name: "数据管理", path: "#" },

@@ -24,6 +24,7 @@ type TypeListResponse = string[];
 type RawDataResponse = { FileName: string; FileContent: string; };
 type ProcessedDataResponse = { data: { time: string, value: number }[]; max_abs: number; status: string; };
 type CleanDataResponse = { result: { [key: string]: string | boolean }; status: string };
+type ModelDataResponse = { ModelID: number; ModelName: string; ModelType: string; Type: string; extension: string; threshold1: number; threshold2: number; threshold3: number; threshold4: number; window_size: string; }[];
 
 const initChartData = {title: "", content: []} as ChartData;
 const containerStyle = {height: 'calc(100% - 102px)', maxHeight: '300px'};
@@ -46,9 +47,8 @@ const Page = () => {
     const [timeOptions, setTimeOptions] = React.useState<string[]>([]);
     const [selectedType, setSelectedType] = React.useState('');
     const [typeOptions, setTypeOptions] = React.useState<string[]>([]);
-    const [, setSelectedThreshold] = React.useState<string>();
-    const [, setSelectedWindowSize] = React.useState<string>();
-    const [, setSelectedExtension] = React.useState<string>();
+    const [selectedModel, setSelectedModel] = React.useState('');
+    const [modelOptions, setModelOptions] = React.useState<string[]>([]);
     const [rawData, setRawData] = React.useState(initChartData);
     const [cleanData, setCleanData] = React.useState<CleanDataResponse | null>(null);
     const [filteredData, setFilteredData] = React.useState(initChartData);
@@ -112,8 +112,10 @@ const Page = () => {
                 setLoadingOptions(true);
                 const bridges = await fetchData<BridgeListResponse>('/bridges', {});
                 const types = await fetchData<TypeListResponse>('/types', {});
+                const models = await fetchData<ModelDataResponse>('/data', {});
                 setBridgeOptions(bridges);
                 setTypeOptions(types);
+                setModelOptions(models.map(model => model.ModelName));
             } catch (error) {
                 console.error("加载桥梁和类型选项失败", error);
             } finally {
@@ -199,53 +201,17 @@ const Page = () => {
                         </Select>
                     </div>
 
-                    {/* 阈值选择器 */}
+                    {/* 模型选择器 */}
                     <div className="flex items-start flex-col">
-                        <label className="text-white font-bold px-2">阈值</label>
-                        <Select onValueChange={setSelectedThreshold} defaultValue="0.01">
+                        <label className="text-white font-bold px-2">模型</label>
+                        <Select onValueChange={setSelectedModel}>
                             <SelectTrigger className="w-[180px] text-white">
-                                <SelectValue placeholder="选择阈值"/>
+                                <SelectValue placeholder="选择模型"/>
                             </SelectTrigger>
                             <SelectContent>
                                 <SelectGroup>
-                                    <SelectLabel>阈值列表</SelectLabel>
-                                    {["0.01"].map(option => (
-                                        <SelectItem key={option} value={option}>{option}</SelectItem>
-                                    ))}
-                                </SelectGroup>
-                            </SelectContent>
-                        </Select>
-                    </div>
-
-                    {/* 窗口大小选择器 */}
-                    <div className="flex items-start flex-col">
-                        <label className="text-white font-bold px-2">窗口大小</label>
-                        <Select onValueChange={setSelectedWindowSize} defaultValue="100">
-                            <SelectTrigger className="w-[180px] text-white">
-                                <SelectValue placeholder="选择窗口大小"/>
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectGroup>
-                                    <SelectLabel>窗口大小列表</SelectLabel>
-                                    {["100"].map(option => (
-                                        <SelectItem key={option} value={option}>{option}</SelectItem>
-                                    ))}
-                                </SelectGroup>
-                            </SelectContent>
-                        </Select>
-                    </div>
-
-                    {/* 扩展选择器 */}
-                    <div className="flex items-start flex-col">
-                        <label className="text-white font-bold px-2">扩展</label>
-                        <Select onValueChange={setSelectedExtension} defaultValue="0.05">
-                            <SelectTrigger className="w-[180px] text-white">
-                                <SelectValue placeholder="选择扩展"/>
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectGroup>
-                                    <SelectLabel>扩展列表</SelectLabel>
-                                    {["0.05"].map(option => (
+                                    <SelectLabel>模型列表</SelectLabel>
+                                    {modelOptions.map(option => (
                                         <SelectItem key={option} value={option}>{option}</SelectItem>
                                     ))}
                                 </SelectGroup>

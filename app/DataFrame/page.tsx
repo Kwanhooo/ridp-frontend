@@ -30,12 +30,12 @@ const initialChartData = {
 } as ChartData;
 
 const DataFrame = () => {
-    const [selectedBridge, setSelectedBridge] = React.useState('武广高铁淦河连续梁桥' as string);
-    const [selectedTime, setSelectedTime] = React.useState('2024-4-10 06:19:38:39884' as string);
-    const [selectedType, setSelectedType] = React.useState('ZZWY1' as string);
+    const [selectedBridge] = React.useState('武广高铁淦河连续梁桥' as string);
+    const [selectedTime] = React.useState('2024-4-10 06:19:38:39884' as string);
+    const [selectedType] = React.useState('ZZWY1' as string);
     const [chartData, setChartData] = React.useState(initialChartData);
     // 删除页面中的aside
-    document.querySelectorAll('aside').forEach(function (aside) {
+    window.document.querySelectorAll('aside').forEach(function (aside) {
         aside.remove();
     });
 
