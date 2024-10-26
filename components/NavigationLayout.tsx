@@ -1,11 +1,19 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 const NavigationLayout = ({ children }: { children: React.ReactNode }) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isDataManagementOpen, setIsDataManagementOpen] = useState(false);
+  const [selectedPage, setSelectedPage] = useState("");
+
+  const pathname = usePathname();
+
+  useEffect(() => {
+    setSelectedPage(pathname);
+  }, [pathname]);
 
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
@@ -44,7 +52,7 @@ const NavigationLayout = ({ children }: { children: React.ReactNode }) => {
       <aside
         className={`${
           isSidebarOpen ? "w-64" : "w-16"
-        } bg-black text-white p-5 transition-all duration-300 ease-in-out border-r-[1px] border-gray-700`}
+        } bg-gray-800 text-white p-5 transition-all duration-300 ease-in-out border-r-[1px] border-gray-700`}
       >
         {/* 顶部按钮 */}
         <div className="flex justify-between items-center mb-6">
@@ -100,7 +108,9 @@ const NavigationLayout = ({ children }: { children: React.ReactNode }) => {
                       }`}
                     >
                       <div
-                        className={`hover:bg-gray-800 transition-all px-4 py-1 rounded-lg flex justify-between items-center`}
+                        className={`hover:bg-blue-500 transition-all px-4 py-1 rounded-lg flex justify-between items-center ${
+                          selectedPage === page.path && "bg-blue-500"
+                        }`}
                       >
                         <span className="whitespace-nowrap overflow-hidden text-ellipsis">
                           {page.name}
@@ -134,7 +144,9 @@ const NavigationLayout = ({ children }: { children: React.ReactNode }) => {
                               }`}
                             >
                               <div
-                                className={`hover:bg-gray-800 transition-all px-4 py-1 rounded-lg`}
+                                className={`hover:bg-blue-500 transition-all px-4 py-1 rounded-lg ${
+                                  selectedPage === option.path && "bg-blue-500"
+                                }`}
                               >
                                 <span className="whitespace-nowrap overflow-hidden text-ellipsis">
                                   {option.name}
@@ -154,7 +166,9 @@ const NavigationLayout = ({ children }: { children: React.ReactNode }) => {
                     }`}
                   >
                     <div
-                      className={`hover:bg-gray-800 transition-all px-4 py-1 rounded-lg`}
+                      className={`hover:bg-blue-500 transition-all px-4 py-1 rounded-lg ${
+                        selectedPage === page.path && "bg-blue-500"
+                      }`}
                     >
                       <span className="whitespace-nowrap overflow-hidden text-ellipsis">
                         {page.name}

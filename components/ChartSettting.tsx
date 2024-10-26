@@ -22,7 +22,7 @@ interface SelectOption {
 
 export default function ChartSetting({ selects, submit }: SelectOption) {
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-6 gap-4 p-1">
+    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 p-1">
       {selects.map((x) => (
         <div key={x.label}>
           <Select
