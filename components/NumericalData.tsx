@@ -98,8 +98,12 @@ export const columns: ColumnDef<NumericalDataType>[] = [
       );
     },
     cell: ({ row }) => {
-      const contentArray = row.getValue<string[]>("Content");
-      return <div>{contentArray.join(", ")}</div>;
+      const contentArray =
+        row.getValue<{ time: string; value: string }[]>("Content");
+      const contentStrings = contentArray.map(
+        (item) => `${item.time}: ${item.value}`
+      );
+      return <div>{contentStrings.join(", ")}</div>;
     },
   },
   {
