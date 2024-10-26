@@ -34,10 +34,10 @@ const Page = () => {
   const [selectedMetric, setSelectedMetric] = useState<string>("");
   const [metricOptions, setMetricOptions] = useState<string[]>([]);
 
-  const [selectedType, setSelectedType] = useState<string>("");
+  // const [selectedType, setSelectedType] = useState<string>("");
 
-  const [selectedLimitation, setSelectedLimitation] = useState<string>("");
-  const [selectedExtension, setSelectedExtension] = useState<string>("");
+  // const [selectedLimitation, setSelectedLimitation] = useState<string>("");
+  // const [selectedExtension, setSelectedExtension] = useState<string>("");
 
   const [originChartData, setOriginChartData] = useState<OriginalData>({
     FileContent: [],
@@ -285,24 +285,24 @@ const Page = () => {
       defaultValue: selectedMetric,
       onChange: setSelectedMetric,
     },
-    {
-      label: "模型类型",
-      options: ["CleanModel", "CutModel", "FilterModel"],
-      defaultValue: selectedType,
-      onChange: setSelectedType,
-    },
-    {
-      label: "阈值",
-      options: ["0.01"],
-      defaultValue: selectedLimitation,
-      onChange: setSelectedLimitation,
-    },
-    {
-      label: "拓展",
-      options: ["0.05"],
-      defaultValue: selectedExtension,
-      onChange: setSelectedExtension,
-    },
+    // {
+    //   label: "模型类型",
+    //   options: ["CleanModel", "CutModel", "FilterModel"],
+    //   defaultValue: selectedType,
+    //   onChange: setSelectedType,
+    // },
+    // {
+    //   label: "阈值",
+    //   options: ["0.01"],
+    //   defaultValue: selectedLimitation,
+    //   onChange: setSelectedLimitation,
+    // },
+    // {
+    //   label: "拓展",
+    //   options: ["0.05"],
+    //   defaultValue: selectedExtension,
+    //   onChange: setSelectedExtension,
+    // },
   ];
 
   const handleSubmit = async () => {

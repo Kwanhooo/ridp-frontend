@@ -91,14 +91,14 @@ import {
           </Button>
         );
       },
-      cell: ({ row }) => <div>{row.getValue("ModelName")}</div>,
+      cell: ({ row }) => <div className="text-center">{row.getValue("ModelName")}</div>,
     },
     {
       accessorKey: "ModelType",
       header: () => <div className="text-right">ModelType</div>,
       cell: ({ row }) => {
         return (
-          <div className="text-right font-medium">
+          <div className="text-center font-medium">
             {row.getValue("ModelType")}
           </div>
         );
@@ -106,7 +106,7 @@ import {
     },
     {
       accessorKey: "Type",
-      header: () => <div className="text-right">Type</div>,
+      header: () => <div className="">Type</div>,
       cell: ({ row }) => {
         return (
           <div className="text-right font-medium">{row.getValue("Type")}</div>
