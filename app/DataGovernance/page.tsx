@@ -24,7 +24,18 @@ type TypeListResponse = string[];
 type RawDataResponse = { FileName: string; FileContent: string; };
 type ProcessedDataResponse = { data: { time: string, value: number }[]; max_abs: number; status: string; };
 type CleanDataResponse = { result: { [key: string]: string | boolean }; status: string };
-type ModelDataResponse = { ModelID: number; ModelName: string; ModelType: string; Type: string; extension: string; threshold1: number; threshold2: number; threshold3: number; threshold4: number; window_size: string; }[];
+type ModelDataResponse = {
+    ModelID: number;
+    ModelName: string;
+    ModelType: string;
+    Type: string;
+    extension: string;
+    threshold1: number;
+    threshold2: number;
+    threshold3: number;
+    threshold4: number;
+    window_size: string;
+}[];
 
 const initChartData = {title: "", content: []} as ChartData;
 const containerStyle = {height: 'calc(100% - 102px)', maxHeight: '300px'};
@@ -85,7 +96,7 @@ const Page = () => {
                     return;
                 }
 
-                const filteredDataResponse = await fetchData<ProcessedDataResponse>('/model-management/process', {
+                const filteredDataResponse = await fetchData<ProcessedDataResponse>('/model-management/cut', {
                     bridge: selectedBridge,
                     time: selectedTime,
                     type: selectedType,
@@ -93,7 +104,7 @@ const Page = () => {
                 });
                 setFilteredData({title: filteredDataResponse.max_abs, content: filteredDataResponse.data});
 
-                const processDataResponse = await fetchData<ProcessedDataResponse>('/model-management/filter', {
+                const processDataResponse = await fetchData<ProcessedDataResponse>('/model-management/process', {
                     bridge: selectedBridge,
                     time: selectedTime,
                     type: selectedType,
@@ -141,17 +152,17 @@ const Page = () => {
     }, [selectedBridge, selectedTime, selectedType]);
 
     return (
-        <div className="h-full bg-black">
+        <div className="h-full">
             <ToastContainer/>
             {loadingOptions ? (
-                <div className="text-white text-center p-4">加载选项中...</div>
+                <div className=" text-center p-4">加载选项中...</div>
             ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-6 gap-4 p-2 pb-3 border-b-[1px] border-gray-600">
                     {/* 桥梁选择器 */}
                     <div className="flex items-start flex-col">
-                        <label className="text-white font-bold px-2">桥梁</label>
+                        <label className=" font-bold px-2">桥梁</label>
                         <Select onValueChange={setSelectedBridge}>
-                            <SelectTrigger className="w-[180px] text-white">
+                            <SelectTrigger className="w-[180px] ">
                                 <SelectValue placeholder="选择桥梁"/>
                             </SelectTrigger>
                             <SelectContent>
@@ -167,9 +178,9 @@ const Page = () => {
 
                     {/* 时间选择器 */}
                     <div className="flex items-start flex-col">
-                        <label className="text-white font-bold px-2">时间</label>
+                        <label className=" font-bold px-2">时间</label>
                         <Select onValueChange={setSelectedTime}>
-                            <SelectTrigger className="w-[180px] text-white">
+                            <SelectTrigger className="w-[180px] ">
                                 <SelectValue placeholder="选择时间"/>
                             </SelectTrigger>
                             <SelectContent>
@@ -185,9 +196,9 @@ const Page = () => {
 
                     {/* 指标选择器 */}
                     <div className="flex items-start flex-col">
-                        <label className="text-white font-bold px-2">指标</label>
+                        <label className=" font-bold px-2">指标</label>
                         <Select onValueChange={setSelectedType}>
-                            <SelectTrigger className="w-[180px] text-white">
+                            <SelectTrigger className="w-[180px] ">
                                 <SelectValue placeholder="选择指标"/>
                             </SelectTrigger>
                             <SelectContent>
@@ -203,9 +214,9 @@ const Page = () => {
 
                     {/* 模型选择器 */}
                     <div className="flex items-start flex-col">
-                        <label className="text-white font-bold px-2">模型</label>
+                        <label className=" font-bold px-2">模型</label>
                         <Select onValueChange={setSelectedModel}>
-                            <SelectTrigger className="w-[180px] text-white">
+                            <SelectTrigger className="w-[180px] ">
                                 <SelectValue placeholder="选择模型"/>
                             </SelectTrigger>
                             <SelectContent>

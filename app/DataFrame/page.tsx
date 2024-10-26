@@ -34,11 +34,13 @@ const DataFrame = () => {
     const [selectedTime] = React.useState('2024-4-10 06:19:38:39884' as string);
     const [selectedType] = React.useState('ZZWY1' as string);
     const [chartData, setChartData] = React.useState(initialChartData);
-    // 删除页面中的aside
-    window.document.querySelectorAll('aside').forEach(function (aside) {
-        aside.remove();
-    });
 
+    React.useEffect(() => {
+        // 删除所有的 aside 元素
+        window.document.querySelectorAll('aside').forEach(function (aside) {
+            aside.remove();
+        });
+    }, []); // 空数组表示仅在组件挂载时执行一次
 
     React.useEffect(() => {
         const refreshChartData = async () => {
@@ -60,7 +62,7 @@ const DataFrame = () => {
 
 
     return (
-        <div className="h-full flex flex-col bg-black">
+        <div className="h-full flex flex-col bg-[rgb(31,41,55)]">
             <NoHeadLineChart data={chartData}/>
         </div>
     );
