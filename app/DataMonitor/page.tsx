@@ -32,6 +32,7 @@ type DataColumn = {
     image: string | null
 }
 type TypeListResponse = string[];
+type BridgeListResponse = string[];
 
 const fetchData = async <T, >(url: string, params?: object): Promise<T> => {
     try {
@@ -105,83 +106,25 @@ const data: DataColumn[] = [
         endTime: "2024-11-08 15:12:21",
         speed: "308 km/h",
         image: "http://119.36.93.106:30900/monitorapi/TrainPassingService/getTrainPassingFile?path=/Img/20241108/AK0868423/1/181691_AK0868423_1_20241108151151.jpg",
-    },
-    {
-        id: "7",
-        bridge: "某高铁简支梁桥",
-        section: "简支梁段",
-        startTime: "2024-11-08 15:11:51",
-        endTime: "2024-11-08 15:12:21",
-        speed: "308 km/h",
-        image: "http://119.36.93.106:30900/monitorapi/TrainPassingService/getTrainPassingFile?path=/Img/20241108/AK0868423/1/181691_AK0868423_1_20241108151151.jpg",
-    },
-    {
-        id: "7",
-        bridge: "某高铁简支梁桥",
-        section: "简支梁段",
-        startTime: "2024-11-08 15:11:51",
-        endTime: "2024-11-08 15:12:21",
-        speed: "308 km/h",
-        image: "http://119.36.93.106:30900/monitorapi/TrainPassingService/getTrainPassingFile?path=/Img/20241108/AK0868423/1/181691_AK0868423_1_20241108151151.jpg",
-    },
-    {
-        id: "7",
-        bridge: "某高铁简支梁桥",
-        section: "简支梁段",
-        startTime: "2024-11-08 15:11:51",
-        endTime: "2024-11-08 15:12:21",
-        speed: "308 km/h",
-        image: "http://119.36.93.106:30900/monitorapi/TrainPassingService/getTrainPassingFile?path=/Img/20241108/AK0868423/1/181691_AK0868423_1_20241108151151.jpg",
-    },
-    {
-        id: "7",
-        bridge: "某高铁简支梁桥",
-        section: "简支梁段",
-        startTime: "2024-11-08 15:11:51",
-        endTime: "2024-11-08 15:12:21",
-        speed: "308 km/h",
-        image: "http://119.36.93.106:30900/monitorapi/TrainPassingService/getTrainPassingFile?path=/Img/20241108/AK0868423/1/181691_AK0868423_1_20241108151151.jpg",
-    },
-    {
-        id: "7",
-        bridge: "某高铁简支梁桥",
-        section: "简支梁段",
-        startTime: "2024-11-08 15:11:51",
-        endTime: "2024-11-08 15:12:21",
-        speed: "308 km/h",
-        image: "http://119.36.93.106:30900/monitorapi/TrainPassingService/getTrainPassingFile?path=/Img/20241108/AK0868423/1/181691_AK0868423_1_20241108151151.jpg",
-    },
-    {
-        id: "7",
-        bridge: "某高铁简支梁桥",
-        section: "简支梁段",
-        startTime: "2024-11-08 15:11:51",
-        endTime: "2024-11-08 15:12:21",
-        speed: "308 km/h",
-        image: "http://119.36.93.106:30900/monitorapi/TrainPassingService/getTrainPassingFile?path=/Img/20241108/AK0868423/1/181691_AK0868423_1_20241108151151.jpg",
-    },
-    {
-        id: "7",
-        bridge: "某高铁简支梁桥",
-        section: "简支梁段",
-        startTime: "2024-11-08 15:11:51",
-        endTime: "2024-11-08 15:12:21",
-        speed: "308 km/h",
-        image: "http://119.36.93.106:30900/monitorapi/TrainPassingService/getTrainPassingFile?path=/Img/20241108/AK0868423/1/181691_AK0868423_1_20241108151151.jpg",
-    },
+    }
 ];
 
 const DataMonitor = () => {
+    // 表格
     const [sorting, setSorting] = React.useState<SortingState>([])
-    const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
-        []
-    )
-    const [columnVisibility, setColumnVisibility] =
-        React.useState<VisibilityState>({})
-    const [rowSelection, setRowSelection] = React.useState({})
-    const [typeOptions, setTypeOptions] = React.useState<string[]>([]);
+    const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
+    const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({})
     const [selectedDetailRow, setSelectedDetailRow] = React.useState<DataColumn | undefined>(undefined);
+    const [rowSelection, setRowSelection] = React.useState({})
 
+    // 选择器的可选项
+    const [typeOptions, setTypeOptions] = React.useState<string[]>([]);
+    const [bridgeOptions, setBridgeOptions] = React.useState<string[]>([])
+
+    // 选择器的选择值
+    const [selectedBridge, setSelectedBridge] = React.useState<string>('');
+    const [selectedStartTime, setSelectedStartTime] = React.useState<string>('');
+    const [selectedEndTime, setSelectedEndTime] = React.useState<string>('');
 
     function handleRowClicked(row: Row<DataColumn>) {
         const rowData = row.original
@@ -263,9 +206,21 @@ const DataMonitor = () => {
     ];
 
     React.useEffect(() => {
+        const fetchBridges = async () => {
+            try {
+                const bridges = await fetchData<BridgeListResponse>('/bridges', {});
+                setBridgeOptions(bridges)  // 设置桥梁选项
+            } catch (error) {
+                console.error("加载桥梁数据失败", error)
+            }
+        }
+        fetchBridges()
+    }, [])
+
+    React.useEffect(() => {
         const loadOptions = async () => {
             try {
-                const types = await fetchData<TypeListResponse>('/types', {});
+                const types = await fetchData<TypeListResponse>('/pointName', {});
                 setTypeOptions(types);
             } catch (error) {
                 console.error("加载类型失败", error);
@@ -294,37 +249,46 @@ const DataMonitor = () => {
         },
     })
 
+    const handleSearchClicked = () => {
+        console.log(selectedBridge, selectedStartTime, selectedEndTime)
+    }
+
     return (
         <div className="h-full w-full flex flex-row">
-            <div className="h-full w-2/5 flex flex-col p-4">
+            {/* 左侧部分 */}
+            <div className="h-full w-1/2 flex flex-col p-4 overflow-auto">
                 {/* 条件查询选择器部分 */}
                 <div className="flex flex-row items-center space-x-4 mb-4">
-                    {/* 桥梁、隧道、路基选择器 */}
-                    <Select>
+                    {/* 桥梁选择器 */}
+                    <Select onValueChange={setSelectedBridge}>
                         <SelectTrigger className="w-[180px]">
                             <SelectValue placeholder="请选择"/>
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem value="option1">选项1</SelectItem>
-                            <SelectItem value="option2">选项2</SelectItem>
-                            <SelectItem value="option3">选项3</SelectItem>
+                            {bridgeOptions.map((bridge, index) => (
+                                <SelectItem key={index} value={bridge}>
+                                    {bridge}
+                                </SelectItem>
+                            ))}
                         </SelectContent>
                     </Select>
 
                     {/* 开始时间选择器 */}
                     <input type="datetime-local" className="border border-gray-300 rounded px-2 py-1 w-[180px]"
-                           placeholder="开始时间"/>
+                           placeholder="开始时间" onChange={(e) => setSelectedStartTime(e.target.value)}/>
 
                     {/* 结束时间选择器 */}
                     <input type="datetime-local" className="border border-gray-300 rounded px-2 py-1 w-[180px]"
-                           placeholder="结束时间"/>
+                           placeholder="结束时间" onChange={(e) => setSelectedEndTime(e.target.value)}/>
 
                     {/* 搜索按钮 */}
-                    <Button>搜索</Button>
+                    <Button onClick={handleSearchClicked}>搜索</Button>
 
                     {/* 实时数据按钮 */}
                     <Button>实时数据</Button>
                 </div>
+
+                {/* 表格部分 */}
                 <div className="grow">
                     <div className="w-full">
                         <div className="rounded-md border">
@@ -403,14 +367,19 @@ const DataMonitor = () => {
                         </div>
                     </div>
                 </div>
-            </div>
-            <div className="dm-panel h-full w-3/5 p-4 flex flex-col space-y-4">
-                <div className="w-full h-fit flex justify-center">
+
+                {/* 视频 */}
+                <div className="w-full h-fit flex justify-center mt-4">
                     <video className="w-auto h-[400px]" src="/video.mp4" autoPlay={true} controls={true}/>
                 </div>
-                <div className="w-full overflow-auto">
+            </div>
+
+            {/* 右侧部分 */}
+            <div className="dm-panel h-full w-1/2 p-4 flex flex-col space-y-4">
+                {/* 一行两个 */}
+                <div className="grid grid-cols-2 gap-4">
                     {typeOptions.map((type, index) => (
-                        <div key={index}>
+                        <div key={index} className="w-full">
                             <div className="text-base font-semibold">{type}</div>
                             <div className="w-full h-[150px]">
                                 <DemoLineChart bridge="武广高铁淦河连续梁桥" time="2024-4-10 06:19:38:39884"
