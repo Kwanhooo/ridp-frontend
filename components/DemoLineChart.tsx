@@ -23,29 +23,26 @@ type MetricsResponse = {
 const fetchChartData = (bridge: string, time: string, type: string) =>
     get<MetricsResponse>('/metrics', {bridge, time, type});
 
-
 const initialChartData = {
     title: "",
     content: [],
 } as ChartData;
 
-const DataFrame = () => {
-    const [selectedBridge] = React.useState('武广高铁淦河连续梁桥' as string);
-    const [selectedTime] = React.useState('2024-4-10 06:19:38:39884' as string);
-    const [selectedType] = React.useState('ZZWY1' as string);
-    const [chartData, setChartData] = React.useState(initialChartData);
-    // 删除页面中的aside
-    window.document.querySelectorAll('aside').forEach(function (aside) {
-        aside.remove();
-    });
+interface DemoLineChartProps {
+    bridge: string;
+    time: string;
+    type: string;
+}
 
+const DemoLineChart: React.FC<DemoLineChartProps> = ({bridge, time, type}) => {
+    const [chartData, setChartData] = React.useState(initialChartData);
 
     React.useEffect(() => {
         const refreshChartData = async () => {
-            if (!selectedBridge || !selectedTime || !selectedType) return;
+            if (!bridge || !time || !type) return;
 
             try {
-                const data = await fetchChartData(selectedBridge, selectedTime, selectedType);
+                const data = await fetchChartData(bridge, time, type);
                 setChartData({
                     title: data.FileName,
                     content: JSON.parse(data.FileContent),
@@ -56,14 +53,13 @@ const DataFrame = () => {
         };
 
         refreshChartData();
-    }, [selectedBridge, selectedTime, selectedType]);
-
+    }, [bridge, time, type]);
 
     return (
-        <div className="h-full flex flex-col bg-black">
+        <div className="h-full flex flex-col">
             <NoHeadLineChart data={chartData}/>
         </div>
     );
 };
 
-export default DataFrame;
+export default DemoLineChart;
