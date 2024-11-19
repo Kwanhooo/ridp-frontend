@@ -1,5 +1,5 @@
 "use client"
-import { useState, useEffect } from 'react';
+import {useEffect, useState} from 'react';
 
 export default function Home() {
     const [windowDimensions, setWindowDimensions] = useState({
@@ -22,7 +22,7 @@ export default function Home() {
     }, []);
 
     return (
-        <div style={{ flexGrow: 1, height: '100vh' }}>
+        <div style={{flexGrow: 1, height: '100vh'}}>
             <iframe
                 src="https://bootapi.jeecg.com/bigscreen/#/view/1849734583881375746"
                 style={{
