@@ -1,8 +1,8 @@
 "use client"
 import * as React from "react";
-import 'react-toastify/dist/ReactToastify.css'; // 引入样式
-import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select"; // 选择器组件库
-import {Button} from "@/components/ui/button"; // 按钮组件
+import 'react-toastify/dist/ReactToastify.css';
+import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
+import {Button} from "@/components/ui/button";
 import {
     ColumnDef,
     ColumnFiltersState,
@@ -22,18 +22,37 @@ import {get} from "@/app/uitils/HttpAxios";
 import {showErrorToast} from "@/app/uitils/toast";
 import DemoLineChart from "@/components/DemoLineChart";
 
+/**
+ * 一些类型定义
+ */
 type DataColumn = {
-    id: string
-    bridge: string
-    section: string
-    startTime: string
-    endTime: string
-    speed: string
-    image: string | null
-}
+    anays_data: any | null; // 可能为 null 或任意类型
+    bridge_full_name: string | null; // 可能为 null 或字符串
+    bridge_id: number; // 数字类型
+    bridge_name: string; // 字符串类型
+    created_at: string; // 字符串类型，存储日期时间
+    created_by: string; // 字符串类型
+    device_sn: string; // 字符串类型
+    id: number; // 数字类型
+    is_deleted: number; // 数字类型（0 或 1）
+    pass_end_time: string; // 字符串类型，存储日期时间
+    pass_time: string; // 字符串类型，存储日期时间
+    post_pic_url: string; // 字符串类型，URL
+    post_video_url: string; // 字符串类型，视频 URL
+    proc_status: number; // 数字类型
+    proc_sum: number; // 数字类型
+    snap_pic_url: string; // 字符串类型，快照图片 URL
+    speed: number; // 数字类型
+    updated_at: string; // 字符串类型，存储日期时间
+    updated_by: string; // 字符串类型
+    video_url: string; // 字符串类型，视频 URL
+    weight: number; // 数字类型
+    zip_pic_url: string; // 字符串类型，zip 文件 URL
+};
 type TypeListResponse = string[];
 type BridgeListResponse = string[];
 
+// 通用请求方法
 const fetchData = async <T, >(url: string, params?: object): Promise<T> => {
     try {
         return await get<T>(url, params);
@@ -43,72 +62,6 @@ const fetchData = async <T, >(url: string, params?: object): Promise<T> => {
     }
 };
 
-const data: DataColumn[] = [
-    {
-        id: "1",
-        bridge: "某城际铁路高架桥与路桥过渡段",
-        section: "过渡段",
-        startTime: "2024-11-08 15:22:49",
-        endTime: "2024-11-08 15:23:04",
-        speed: "82 km/h",
-        image: "http://119.36.93.106:30900/monitorapi/TrainPassingService/getTrainPassingFile?path=/Img/20241108/AK0868423/1/181691_AK0868423_1_20241108151151.jpg",
-    },
-    {
-        id: "2",
-        bridge: "某城际铁路高架桥与路桥过渡段",
-        section: "简支梁段",
-        startTime: "2024-11-08 15:22:43",
-        endTime: "2024-11-08 15:22:58",
-        speed: "82 km/h",
-        image: "http://119.36.93.106:30900/monitorapi/TrainPassingService/getTrainPassingFile?path=/Img/20241108/AK0868423/1/181691_AK0868423_1_20241108151151.jpg",
-    },
-    {
-        id: "3",
-        bridge: "某高铁简支梁桥",
-        section: "简支梁段",
-        startTime: "2024-11-08 15:19:53",
-        endTime: "2024-11-08 15:20:23",
-        speed: "308 km/h",
-        image: "http://119.36.93.106:30900/monitorapi/TrainPassingService/getTrainPassingFile?path=/Img/20241108/AK0868423/1/181691_AK0868423_1_20241108151151.jpg",
-    },
-    {
-        id: "4",
-        bridge: "某高铁桥工点",
-        section: "路基段",
-        startTime: "2024-11-08 15:19:15",
-        endTime: "2024-11-08 15:19:45",
-        speed: "308 km/h",
-        image: "http://119.36.93.106:30900/monitorapi/TrainPassingService/getTrainPassingFile?path=/Img/20241108/AK0868423/1/181691_AK0868423_1_20241108151151.jpg",
-    },
-    {
-        id: "5",
-        bridge: "某高铁简支梁桥",
-        section: "简支梁段",
-        startTime: "2024-11-08 15:15:31",
-        endTime: "2024-11-08 15:16:01",
-        speed: "308 km/h",
-        image: "http://119.36.93.106:30900/monitorapi/TrainPassingService/getTrainPassingFile?path=/Img/20241108/AK0868423/1/181691_AK0868423_1_20241108151151.jpg",
-    },
-    {
-        id: "6",
-        bridge: "某高铁桥工点",
-        section: "路基段",
-        startTime: "2024-11-08 15:14:53",
-        endTime: "2024-11-08 15:15:23",
-        speed: "308 km/h",
-        image: "http://119.36.93.106:30900/monitorapi/TrainPassingService/getTrainPassingFile?path=/Img/20241108/AK0868423/1/181691_AK0868423_1_20241108151151.jpg",
-    },
-    {
-        id: "7",
-        bridge: "某高铁简支梁桥",
-        section: "简支梁段",
-        startTime: "2024-11-08 15:11:51",
-        endTime: "2024-11-08 15:12:21",
-        speed: "308 km/h",
-        image: "http://119.36.93.106:30900/monitorapi/TrainPassingService/getTrainPassingFile?path=/Img/20241108/AK0868423/1/181691_AK0868423_1_20241108151151.jpg",
-    }
-];
-
 const DataMonitor = () => {
     // 表格
     const [sorting, setSorting] = React.useState<SortingState>([])
@@ -117,21 +70,82 @@ const DataMonitor = () => {
     const [selectedDetailRow, setSelectedDetailRow] = React.useState<DataColumn | undefined>(undefined);
     const [rowSelection, setRowSelection] = React.useState({})
 
-    // 选择器的可选项
-    const [typeOptions, setTypeOptions] = React.useState<string[]>([]);
+    // 可选项
+    const [pointNameOptions, setPointNameOptions] = React.useState<string[]>([]);
     const [bridgeOptions, setBridgeOptions] = React.useState<string[]>([])
 
     // 选择器的选择值
     const [selectedBridge, setSelectedBridge] = React.useState<string>('');
+    const [video, setVideo] = React.useState<string>('');
     const [selectedStartTime, setSelectedStartTime] = React.useState<string>('');
     const [selectedEndTime, setSelectedEndTime] = React.useState<string>('');
 
-    function handleRowClicked(row: Row<DataColumn>) {
-        const rowData = row.original
-        setSelectedDetailRow(rowData)
-        console.log(selectedDetailRow)
+    // 表格分页
+    const [data, setData] = React.useState<DataColumn[]>([]);
+    const [page, setPage] = React.useState(1);
+    const [pageSize] = React.useState(6);
+    // const [total, setTotal] = React.useState(0);
+
+    // 加载分页表格数据
+    const fetchTableData = async () => {
+        try {
+            const tableData = await fetchData<DataColumn[]>('/train_passing', {
+                bridge: selectedBridge,
+                time: selectedStartTime,
+                page,
+                pageSize,
+            });
+            setData(tableData);
+        } catch (error) {
+            console.error("加载表格数据失败", error);
+        }
+    };
+
+    // 上一页
+    const previousPage = () => {
+        setPage(page - 1);
+    };
+
+    // 下一页
+    const nextPage = () => {
+        setPage(page + 1);
+    };
+
+    // 格式化时间
+    const formatTime = (time: string) => {
+        // Fri, 01 Nov 2024 07:44:35 GM to 2024-11-01 13:25:16
+        const date = new Date(time);
+        const year = date.getFullYear();
+        const month = (date.getMonth() + 1).toString().padStart(2, '0');  // 补充0
+        const day = date.getDate().toString().padStart(2, '0');  // 补充0
+        const hour = date.getHours().toString().padStart(2, '0');  // 补充0
+        const minute = date.getMinutes().toString().padStart(2, '0');  // 补充0
+        const second = date.getSeconds().toString().padStart(2, '0');  // 补充0
+
+        return `${year}-${month}-${day} ${hour}:${minute}:${second}`;
     }
 
+    // 查看详情点击事件
+    function handleDetailClicked(row: Row<DataColumn>) {
+        const rowData = row.original
+        setSelectedDetailRow(rowData)
+        setSelectedBridge(rowData.bridge_name)
+        fetchData<{ status: string, video_url: string }>('/video', {
+            bridge: rowData.bridge_name,
+            time: formatTime(rowData.pass_time)
+        }).then(res => {
+            setVideo(res.video_url)
+        })
+        console.log(rowData)
+    }
+
+    // 搜索按钮点击事件
+    const handleSearchClicked = () => {
+        setPage(1)
+        fetchTableData()
+    }
+
+    // 表格列定义
     const columns: ColumnDef<DataColumn>[] = [
         {
             id: "select",
@@ -156,24 +170,24 @@ const DataMonitor = () => {
             enableHiding: false,
         },
         {
-            accessorKey: "bridge",
+            accessorKey: "bridge_name",
             header: "桥梁",
-            cell: ({row}) => <div>{row.getValue("bridge")}</div>,
+            cell: ({row}) => <div>{row.getValue("bridge_name")}</div>,
         },
         {
-            accessorKey: "section",
-            header: "截面",
-            cell: ({row}) => <div>{row.getValue("section")}</div>,
+            accessorKey: "device_sn",
+            header: "传感器SN",
+            cell: ({row}) => <div>{row.getValue("device_sn")}</div>,
         },
         {
-            accessorKey: "startTime",
+            accessorKey: "pass_time",
             header: "开始时间",
-            cell: ({row}) => <div>{row.getValue("startTime")}</div>,
+            cell: ({row}) => <div>{formatTime(row.getValue("pass_time"))}</div>,
         },
         {
-            accessorKey: "endTime",
+            accessorKey: "pass_end_time",
             header: "结束时间",
-            cell: ({row}) => <div>{row.getValue("endTime")}</div>,
+            cell: ({row}) => <div>{formatTime(row.getValue("pass_end_time"))}</div>,
         },
         {
             accessorKey: "speed",
@@ -186,16 +200,16 @@ const DataMonitor = () => {
             cell: ({row}) => {
                 return (
                     <div className="cursor-pointer text-blue-500">
-                        <a onClick={() => handleRowClicked(row)}>查看详情</a>
+                        <a onClick={() => handleDetailClicked(row)}>查看详情</a>
                     </div>
                 );
             }
         },
         {
-            accessorKey: "image",
+            accessorKey: "post_pic_url",
             header: "过车图片",
             cell: ({row}) => {
-                const imageUrl = row.getValue("image");
+                const imageUrl = row.getValue("post_pic_url");
                 return imageUrl && typeof imageUrl === 'string' ? (
                     <img src={imageUrl} alt="过车图片" style={{width: '75px', height: 'auto'}}/>
                 ) : (
@@ -205,6 +219,7 @@ const DataMonitor = () => {
         },
     ];
 
+    // 立即加载桥梁数据
     React.useEffect(() => {
         const fetchBridges = async () => {
             try {
@@ -217,19 +232,26 @@ const DataMonitor = () => {
         fetchBridges()
     }, [])
 
+    // 立即加载类型数据
     React.useEffect(() => {
-        const loadOptions = async () => {
+        const fetchPointName = async () => {
             try {
-                const types = await fetchData<TypeListResponse>('/pointName', {});
-                setTypeOptions(types);
+                const pointName = await fetchData<TypeListResponse>('/pointName', {bridge: selectedBridge});
+                setPointNameOptions(pointName);
             } catch (error) {
                 console.error("加载类型失败", error);
             }
         };
-        loadOptions();
+        fetchPointName();
 
-    }, []);
+    }, [selectedBridge]);
 
+    // 立即加载表格分页数据
+    React.useEffect(() => {
+        fetchTableData();
+    }, [page, pageSize]);
+
+    // 表格实例
     const table = useReactTable({
         data,
         columns,
@@ -248,10 +270,6 @@ const DataMonitor = () => {
             rowSelection,
         },
     })
-
-    const handleSearchClicked = () => {
-        console.log(selectedBridge, selectedStartTime, selectedEndTime)
-    }
 
     return (
         <div className="h-full w-full flex flex-row">
@@ -350,16 +368,16 @@ const DataMonitor = () => {
                                 <Button
                                     variant="outline"
                                     size="sm"
-                                    onClick={() => table.previousPage()}
-                                    disabled={!table.getCanPreviousPage()}
+                                    onClick={() => previousPage()}
+                                    // disabled={!table.getCanPreviousPage()}
                                 >
                                     上一页
                                 </Button>
                                 <Button
                                     variant="outline"
                                     size="sm"
-                                    onClick={() => table.nextPage()}
-                                    disabled={!table.getCanNextPage()}
+                                    onClick={() => nextPage()}
+                                    // disabled={!table.getCanNextPage()}
                                 >
                                     下一页
                                 </Button>
@@ -368,21 +386,23 @@ const DataMonitor = () => {
                     </div>
                 </div>
 
-                {/* 视频 */}
+                {/* 视频播放 */}
                 <div className="w-full h-fit flex justify-center mt-4">
-                    <video className="w-auto h-[400px]" src="/video.mp4" autoPlay={true} controls={true}/>
+                    <video className="w-auto h-[300px]" src={selectedDetailRow?.post_video_url} autoPlay={true}
+                           controls={true}/>
                 </div>
             </div>
 
             {/* 右侧部分 */}
-            <div className="dm-panel h-full w-1/2 p-4 flex flex-col space-y-4">
+            <div className="dm-panel h-full w-1/2 p-4 flex flex-col space-y-4 overflow-auto">
                 {/* 一行两个 */}
                 <div className="grid grid-cols-2 gap-4">
-                    {typeOptions.map((type, index) => (
+                    {pointNameOptions.map((type, index) => (
                         <div key={index} className="w-full">
                             <div className="text-base font-semibold">{type}</div>
                             <div className="w-full h-[150px]">
-                                <DemoLineChart bridge="武广高铁淦河连续梁桥" time="2024-4-10 06:19:38:39884"
+                                <DemoLineChart bridge={selectedBridge}
+                                               time={selectedDetailRow ? formatTime(selectedDetailRow.pass_time) : ''}
                                                type={type}/>
                             </div>
                         </div>
