@@ -1,6 +1,6 @@
-// pages/page1.tsx
+// pages/page.tsx
 
-const Page1 = () => {
+const Page = () => {
     return (
         <div className="h-[100%] flex justify-center items-center text-7xl font-extrabold">
             轨道交通基础设施多模态数据平台
@@ -8,4 +8,4 @@ const Page1 = () => {
     );
 };
 
-export default Page1;
+export default Page;
