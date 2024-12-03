@@ -115,12 +115,12 @@ const DataMonitor = () => {
     const formatTime = (time: string) => {
         // Fri, 01 Nov 2024 07:44:35 GM to 2024-11-01 13:25:16
         const date = new Date(time);
-        const year = date.getFullYear();
-        const month = (date.getMonth() + 1).toString().padStart(2, '0');  // 补充0
-        const day = date.getDate().toString().padStart(2, '0');  // 补充0
-        const hour = date.getHours().toString().padStart(2, '0');  // 补充0
-        const minute = date.getMinutes().toString().padStart(2, '0');  // 补充0
-        const second = date.getSeconds().toString().padStart(2, '0');  // 补充0
+        const year = date.getUTCFullYear();
+        const month = (date.getUTCMonth() + 1).toString().padStart(2, '0');  // 补充0
+        const day = date.getUTCDate().toString().padStart(2, '0');  // 补充0
+        const hour = (date.getUTCHours()).toString().padStart(2, '0');  // 补充0
+        const minute = date.getUTCMinutes().toString().padStart(2, '0');  // 补充0
+        const second = date.getUTCSeconds().toString().padStart(2, '0');  // 补充0
 
         return `${year}-${month}-${day} ${hour}:${minute}:${second}`;
     }
@@ -388,7 +388,7 @@ const DataMonitor = () => {
 
                 {/* 视频播放 */}
                 <div className="w-full h-fit flex justify-center mt-4">
-                    <video className="w-auto h-[300px]" src={selectedDetailRow?.post_video_url} autoPlay={true}
+                    <video className="w-auto h-[300px]" src={video} autoPlay={true}
                            controls={true}/>
                 </div>
             </div>
