@@ -1,8 +1,8 @@
 import React from 'react';
 
 const MonitorPage = () => {
-    // 视频源的数组
-    const videoUrls = [
+    // 视频源
+    const liveStream = [
         "http://119.36.93.103:30779/video?proName=guidao&chanName=B7DD532F-6151-459A-B53C-B849E9BE9B22",
         "http://119.36.93.103:30779/video?proName=guidao&chanName=AK0868434_1",
         "http://119.36.93.103:30779/video?proName=guidao&chanName=AK0868423_1",
@@ -12,9 +12,8 @@ const MonitorPage = () => {
 
     return (
         <div className="w-full h-full overflow-auto space-y-6 p-6 px-[10%]">
-            {/* 第一行，两个视频 */}
             <div className="flex justify-between gap-6">
-                {videoUrls.slice(0, 2).map((url, index) => (
+                {liveStream.slice(0, 2).map((url, index) => (
                     <div key={index} className="w-1/2 bg-white shadow-md rounded-lg overflow-hidden">
                         <iframe
                             src={url}
@@ -29,9 +28,8 @@ const MonitorPage = () => {
                 ))}
             </div>
 
-            {/* 第二行，两个视频 */}
             <div className="flex justify-between gap-6">
-                {videoUrls.slice(2, 4).map((url, index) => (
+                {liveStream.slice(2, 4).map((url, index) => (
                     <div key={index} className="w-1/2 bg-white shadow-md rounded-lg overflow-hidden">
                         <iframe
                             src={url}
@@ -46,11 +44,10 @@ const MonitorPage = () => {
                 ))}
             </div>
 
-            {/* 第三行，最后一个视频，居左且占满整个宽度 */}
             <div className="flex justify-start gap-6">
                 <div className="w-1/2 bg-white shadow-md rounded-lg overflow-hidden">
                     <iframe
-                        src={videoUrls[4]}
+                        src={liveStream[4]}
                         width="100%"
                         height="400"
                         frameBorder="0"
@@ -59,8 +56,7 @@ const MonitorPage = () => {
                         className="rounded-lg"
                     ></iframe>
                 </div>
-                <div className="w-1/2 bg-white overflow-hidden"></div>
-
+                <div className="w-1/2 bg-white opacity-0 overflow-hidden"></div>
             </div>
         </div>
     );

@@ -11,17 +11,14 @@ import {showErrorToast} from "@/app/uitils/toast";
  */
 
 // API响应
-type MetricsResponse = {
-    FileName: string;
-    FileContent: string;
-};
+type MetricsResponse = { time: string | Date; value: number; }[];
 
 /**
  * API 调用
  */
 // 获取图表数据
 const fetchChartData = (bridge: string, time: string, type: string) =>
-    get<MetricsResponse>('/metrics', {bridge, time, type});
+    get<MetricsResponse>('/metrics', {bridge, time, pointName: type});
 
 const initialChartData = {
     title: "",
@@ -44,8 +41,8 @@ const DemoLineChart: React.FC<DemoLineChartProps> = ({bridge, time, type}) => {
             try {
                 const data = await fetchChartData(bridge, time, type);
                 setChartData({
-                    title: data.FileName,
-                    content: JSON.parse(data.FileContent),
+                    title: '',
+                    content: data,
                 });
             } catch (error) {
                 showErrorToast('更新图表数据失败，请稍后再试。', error);
@@ -56,7 +53,7 @@ const DemoLineChart: React.FC<DemoLineChartProps> = ({bridge, time, type}) => {
     }, [bridge, time, type]);
 
     return (
-        <div className="h-full flex flex-col">
+        <div className="w-full h-full flex flex-col">
             <NoHeadLineChart data={chartData}/>
         </div>
     );
