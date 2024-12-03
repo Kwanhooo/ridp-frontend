@@ -28,17 +28,14 @@ export default function NoHeadLineChart({data}: NoHeadLineChartProps) {
                 <LineChart
                     accessibilityLayer
                     data={data.content}
-                    margin={{
-                        left: 12,
-                        right: 12,
-                    }}
+                    margin={{}}
                 >
                     <CartesianGrid vertical={false}/>
                     <XAxis
                         dataKey="time"
-                        tickLine={false}
-                        axisLine={false}
-                        tickMargin={8}
+                        tickLine={true}
+                        axisLine={true}
+                        tickMargin={10}
                         minTickGap={32}
                         tickFormatter={(value) => value.slice(11, 23)}
                     />
@@ -46,7 +43,7 @@ export default function NoHeadLineChart({data}: NoHeadLineChartProps) {
                     <ChartTooltip
                         content={
                             <ChartTooltipContent
-                                className="w-[150px] bg-white"
+                                className="w-[150px]"
                                 nameKey="views"
                                 labelFormatter={(value) => {
                                     return new Date(value).toLocaleDateString("zh-CN", {

@@ -91,7 +91,8 @@ const DataMonitor = () => {
         try {
             const tableData = await fetchData<DataColumn[]>('/train_passing', {
                 bridge: selectedBridge,
-                time: selectedStartTime,
+                pass_time: selectedStartTime,
+                pass_end_time: selectedEndTime,
                 page,
                 pageSize,
             });
@@ -113,14 +114,14 @@ const DataMonitor = () => {
 
     // 格式化时间
     const formatTime = (time: string) => {
-        // Fri, 01 Nov 2024 07:44:35 GM to 2024-11-01 13:25:16
+        // Fri, 01 Nov 2024 07:44:35 GMT to 2024-11-01 13:25:16
         const date = new Date(time);
         const year = date.getUTCFullYear();
-        const month = (date.getUTCMonth() + 1).toString().padStart(2, '0');  // 补充0
-        const day = date.getUTCDate().toString().padStart(2, '0');  // 补充0
-        const hour = (date.getUTCHours()).toString().padStart(2, '0');  // 补充0
-        const minute = date.getUTCMinutes().toString().padStart(2, '0');  // 补充0
-        const second = date.getUTCSeconds().toString().padStart(2, '0');  // 补充0
+        const month = (date.getUTCMonth() + 1).toString().padStart(2, '0');
+        const day = date.getUTCDate().toString().padStart(2, '0');
+        const hour = (date.getUTCHours()).toString().padStart(2, '0');
+        const minute = date.getUTCMinutes().toString().padStart(2, '0');
+        const second = date.getUTCSeconds().toString().padStart(2, '0');
 
         return `${year}-${month}-${day} ${hour}:${minute}:${second}`;
     }
@@ -143,6 +144,13 @@ const DataMonitor = () => {
     const handleSearchClicked = () => {
         setPage(1)
         fetchTableData()
+    }
+
+    // 清空搜索条件
+    const clearSearch = () => {
+        setSelectedBridge('')
+        setSelectedStartTime('')
+        setSelectedEndTime('')
     }
 
     // 表格列定义
@@ -181,18 +189,18 @@ const DataMonitor = () => {
         },
         {
             accessorKey: "pass_time",
-            header: "开始时间",
+            header: "过车开始时刻",
             cell: ({row}) => <div>{formatTime(row.getValue("pass_time"))}</div>,
         },
         {
             accessorKey: "pass_end_time",
-            header: "结束时间",
+            header: "过车结束时刻",
             cell: ({row}) => <div>{formatTime(row.getValue("pass_end_time"))}</div>,
         },
         {
             accessorKey: "speed",
             header: "车速",
-            cell: ({row}) => <div>{row.getValue("speed")}</div>,
+            cell: ({row}) => <div>{row.getValue("speed") + ' km/h'}</div>,
         },
         {
             accessorKey: "operation",
@@ -236,7 +244,7 @@ const DataMonitor = () => {
     React.useEffect(() => {
         const fetchPointName = async () => {
             try {
-                const pointName = await fetchData<TypeListResponse>('/pointName', {bridge: selectedBridge});
+                const pointName = await fetchData<TypeListResponse>('/pointName', {bridge: selectedDetailRow ? selectedDetailRow.bridge_name : ''});
                 setPointNameOptions(pointName);
             } catch (error) {
                 console.error("加载类型失败", error);
@@ -244,7 +252,7 @@ const DataMonitor = () => {
         };
         fetchPointName();
 
-    }, [selectedBridge]);
+    }, [selectedDetailRow]);
 
     // 立即加载表格分页数据
     React.useEffect(() => {
@@ -272,13 +280,13 @@ const DataMonitor = () => {
     })
 
     return (
-        <div className="h-full w-full flex flex-row">
+        <div className="h-full w-full flex flex-row transition-all">
             {/* 左侧部分 */}
-            <div className="h-full w-1/2 flex flex-col p-4 overflow-auto">
+            <div className="h-full grow flex flex-col p-4 overflow-auto">
                 {/* 条件查询选择器部分 */}
                 <div className="flex flex-row items-center space-x-4 mb-4">
                     {/* 桥梁选择器 */}
-                    <Select onValueChange={setSelectedBridge}>
+                    <Select onValueChange={setSelectedBridge} value={selectedBridge}>
                         <SelectTrigger className="w-[180px]">
                             <SelectValue placeholder="请选择"/>
                         </SelectTrigger>
@@ -292,18 +300,21 @@ const DataMonitor = () => {
                     </Select>
 
                     {/* 开始时间选择器 */}
-                    <input type="datetime-local" className="border border-gray-300 rounded px-2 py-1 w-[180px]"
-                           placeholder="开始时间" onChange={(e) => setSelectedStartTime(e.target.value)}/>
+                    <input type="datetime-local"
+                           className="border border-gray-300 rounded px-2 py-1 w-[180px] bg-opacity-0"
+                           placeholder="开始时间" value={selectedStartTime}
+                           onChange={(e) => setSelectedStartTime(e.target.value)}/>
 
                     {/* 结束时间选择器 */}
                     <input type="datetime-local" className="border border-gray-300 rounded px-2 py-1 w-[180px]"
-                           placeholder="结束时间" onChange={(e) => setSelectedEndTime(e.target.value)}/>
+                           placeholder="结束时间" value={selectedEndTime}
+                           onChange={(e) => setSelectedEndTime(e.target.value)}/>
 
                     {/* 搜索按钮 */}
                     <Button onClick={handleSearchClicked}>搜索</Button>
 
-                    {/* 实时数据按钮 */}
-                    <Button>实时数据</Button>
+                    {/* 清空筛选条件按钮 */}
+                    <Button onClick={clearSearch}>清空筛选条件</Button>
                 </div>
 
                 {/* 表格部分 */}
@@ -388,27 +399,30 @@ const DataMonitor = () => {
 
                 {/* 视频播放 */}
                 <div className="w-full h-fit flex justify-center mt-4">
-                    <video className="w-auto h-[300px]" src={video} autoPlay={true}
-                           controls={true}/>
+                    {video && (
+                        <video className="w-auto h-[300px]" src={video} autoPlay controls/>
+                    )}
                 </div>
             </div>
 
             {/* 右侧部分 */}
-            <div className="dm-panel h-full w-1/2 p-4 flex flex-col space-y-4 overflow-auto">
-                {/* 一行两个 */}
-                <div className="grid grid-cols-2 gap-4">
-                    {pointNameOptions.map((type, index) => (
-                        <div key={index} className="w-full">
-                            <div className="text-base font-semibold">{type}</div>
-                            <div className="w-full h-[150px]">
-                                <DemoLineChart bridge={selectedBridge}
-                                               time={selectedDetailRow ? formatTime(selectedDetailRow.pass_time) : ''}
-                                               type={type}/>
+            {selectedDetailRow && (
+                <div className="dm-panel h-full w-1/2 p-4 flex flex-col space-y-4 overflow-auto">
+                    {/* 一行两个 */}
+                    <div className="grid grid-cols-2 gap-6">
+                        {pointNameOptions.map((type, index) => (
+                            <div key={index} className="w-full mb-3">
+                                <div className="text-base font-semibold mb-1">{type}</div>
+                                <div className="w-full h-[200px]">
+                                    <DemoLineChart bridge={selectedBridge}
+                                                   time={selectedDetailRow ? formatTime(selectedDetailRow.pass_time) : ''}
+                                                   type={type}/>
+                                </div>
                             </div>
-                        </div>
-                    ))}
+                        ))}
+                    </div>
                 </div>
-            </div>
+            )}
         </div>
     );
 };
