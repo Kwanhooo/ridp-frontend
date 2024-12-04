@@ -21,6 +21,9 @@ import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow,} from "@/
 import {get} from "@/app/uitils/HttpAxios";
 import {showErrorToast} from "@/app/uitils/toast";
 import DemoLineChart from "@/components/DemoLineChart";
+import {setSidebarState} from "@/store/modules/sidebarSlice";
+import {useDispatch} from "react-redux";
+import {AppDispatch} from "@/store";
 
 /**
  * 一些类型定义
@@ -63,6 +66,10 @@ const fetchData = async <T, >(url: string, params?: object): Promise<T> => {
 };
 
 const DataMonitor = () => {
+    // Redux
+    const dispatch = useDispatch<AppDispatch>();
+    dispatch(setSidebarState(false));
+
     // 表格
     const [sorting, setSorting] = React.useState<SortingState>([])
     const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
