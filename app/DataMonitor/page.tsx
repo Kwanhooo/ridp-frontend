@@ -416,7 +416,9 @@ const DataMonitor = () => {
                                 <div className="w-full h-[200px]">
                                     <DemoLineChart bridge={selectedBridge}
                                                    time={selectedDetailRow ? formatTime(selectedDetailRow.pass_time) : ''}
-                                                   type={type}/>
+                                                   type={type}
+                                                   clear={selectedBridge === ''}
+                                    />
                                 </div>
                             </div>
                         ))}

@@ -29,9 +29,10 @@ interface DemoLineChartProps {
     bridge: string;
     time: string;
     type: string;
+    clear: boolean;
 }
 
-const DemoLineChart: React.FC<DemoLineChartProps> = ({bridge, time, type}) => {
+const DemoLineChart: React.FC<DemoLineChartProps> = ({bridge, time, type, clear}) => {
     const [chartData, setChartData] = React.useState(initialChartData);
 
     React.useEffect(() => {
@@ -51,6 +52,12 @@ const DemoLineChart: React.FC<DemoLineChartProps> = ({bridge, time, type}) => {
 
         refreshChartData();
     }, [bridge, time, type]);
+
+    React.useEffect(() => {
+        if (clear) {
+            setChartData(initialChartData);
+        }
+    }, [clear]);
 
     return (
         <div className="w-full h-full flex flex-col">
