@@ -85,6 +85,7 @@ const DataMonitor = () => {
     const [page, setPage] = React.useState(1);
     const [pageSize] = React.useState(6);
     // const [total, setTotal] = React.useState(0);
+    const [refreshSignal, setRefreshSignal] = React.useState<boolean>(false); // 控制子组件刷新
 
     // 加载分页表格数据
     const fetchTableData = async () => {
@@ -126,19 +127,30 @@ const DataMonitor = () => {
         return `${year}-${month}-${day} ${hour}:${minute}:${second}`;
     }
 
-    // 查看详情点击事件
-    function handleDetailClicked(row: Row<DataColumn>) {
-        const rowData = row.original
-        setSelectedDetailRow(rowData)
-        setSelectedBridge(rowData.bridge_name)
+    // 选择桥梁时更新数据
+    const handleDetailClicked = async (row: Row<DataColumn>) => {
+        const rowData = row.original;
+        setSelectedDetailRow(rowData);
+        setSelectedBridge(rowData.bridge_name);
+
         fetchData<{ status: string, video_url: string }>('/video', {
             bridge: rowData.bridge_name,
             time: formatTime(rowData.pass_time)
         }).then(res => {
             setVideo(res.video_url)
         })
-        console.log(rowData)
-    }
+
+        // 请求 pointName 数据
+        try {
+            const pointName = await fetchData<TypeListResponse>('/pointName', {bridge: rowData.bridge_name});
+            setPointNameOptions(pointName);
+
+            // 请求成功后触发子组件刷新
+            setRefreshSignal(prev => !prev);  // 切换 refreshSignal
+        } catch (error) {
+            console.error("加载类型失败", error);
+        }
+    };
 
     // 搜索按钮点击事件
     const handleSearchClicked = () => {
@@ -414,9 +426,13 @@ const DataMonitor = () => {
                             <div key={index} className="w-full mb-3">
                                 <div className="text-base font-semibold mb-1">{type}</div>
                                 <div className="w-full h-[200px]">
-                                    <DemoLineChart bridge={selectedBridge}
-                                                   time={selectedDetailRow ? formatTime(selectedDetailRow.pass_time) : ''}
-                                                   type={type}/>
+                                    <DemoLineChart
+                                        bridge={selectedBridge}
+                                        time={selectedDetailRow ? formatTime(selectedDetailRow.pass_time) : ''}
+                                        type={type}
+                                        clear={selectedBridge === ''}
+                                        refreshSignal={refreshSignal}  // 将信号传递给子组件
+                                    />
                                 </div>
                             </div>
                         ))}

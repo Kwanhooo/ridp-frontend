@@ -1,4 +1,3 @@
-"use client"
 import * as React from "react";
 import 'react-toastify/dist/ReactToastify.css'; // 引入样式
 import NoHeadLineChart from '@/components/NoHeadLineChart';
@@ -6,17 +5,10 @@ import {get} from "@/app/uitils/HttpAxios";
 import {ChartData} from "@/types/ChartData";
 import {showErrorToast} from "@/app/uitils/toast";
 
-/**
- * 类型定义
- */
-
-// API响应
+// API响应类型
 type MetricsResponse = { time: string | Date; value: number; }[];
 
-/**
- * API 调用
- */
-// 获取图表数据
+// API 调用：获取图表数据
 const fetchChartData = (bridge: string, time: string, type: string) =>
     get<MetricsResponse>('/metrics', {bridge, time, pointName: type});
 
@@ -29,9 +21,11 @@ interface DemoLineChartProps {
     bridge: string;
     time: string;
     type: string;
+    clear: boolean;
+    refreshSignal: boolean; // 用来触发刷新数据
 }
 
-const DemoLineChart: React.FC<DemoLineChartProps> = ({bridge, time, type}) => {
+const DemoLineChart: React.FC<DemoLineChartProps> = ({bridge, time, type, clear, refreshSignal}) => {
     const [chartData, setChartData] = React.useState(initialChartData);
 
     React.useEffect(() => {
@@ -49,8 +43,16 @@ const DemoLineChart: React.FC<DemoLineChartProps> = ({bridge, time, type}) => {
             }
         };
 
-        refreshChartData();
-    }, [bridge, time, type]);
+        if (refreshSignal) {
+            refreshChartData();
+        }
+    }, [bridge, time, type, refreshSignal]);
+
+    React.useEffect(() => {
+        if (clear) {
+            setChartData(initialChartData);
+        }
+    }, [clear]);
 
     return (
         <div className="w-full h-full flex flex-col">
