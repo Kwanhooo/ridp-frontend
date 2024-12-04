@@ -1,11 +1,17 @@
 "use client";
 
-import {useEffect, useState} from "react";
+import React, {useEffect, useState} from "react";
 import Link from "next/link";
 import {usePathname} from "next/navigation";
+import {AppDispatch} from "@/store";
+import {selectSidebar, toggleSidebar} from "@/store/modules/sidebarSlice";
+import {useDispatch, useSelector} from "react-redux";
 
 const NavigationLayout = ({children}: { children: React.ReactNode }) => {
-    const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+    const isSidebarOpen = useSelector(selectSidebar);
+    const dispatch = useDispatch<AppDispatch>();
+
+    // const [isSidebarOpen, setIsSidebarOpen] = useState(true);
     const [isDataManagementOpen, setIsDataManagementOpen] = useState(false);
     const [selectedPage, setSelectedPage] = useState("");
 
@@ -15,8 +21,8 @@ const NavigationLayout = ({children}: { children: React.ReactNode }) => {
         setSelectedPage(pathname);
     }, [pathname]);
 
-    const toggleSidebar = () => {
-        setIsSidebarOpen(!isSidebarOpen);
+    const toggle = () => {
+        dispatch(toggleSidebar());
     };
 
     const toggleDataManagement = () => {
@@ -59,7 +65,7 @@ const NavigationLayout = ({children}: { children: React.ReactNode }) => {
                 {/* 顶部按钮 */}
                 <div className="flex justify-between items-center mb-6">
                     <button
-                        onClick={toggleSidebar}
+                        onClick={toggle}
                         className="text-white focus:outline-none"
                     >
                         {!isSidebarOpen ? (
