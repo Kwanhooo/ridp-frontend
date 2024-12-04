@@ -4,19 +4,19 @@ const MonitorPage = () => {
     // 视频源
     const liveStream = [
         {
-            url: "http://119.36.93.103:30779/video?proName=guidao&chanName=B7DD532F-6151-459A-B53C-B849E9BE9B22",
+            url: "https://monitor.ridp.0xcafebabe.cn/video?proName=guidao&chanName=B7DD532F-6151-459A-B53C-B849E9BE9B22",
             name: "滁宁城际西涧路特大桥1号摄像头"
         },
         {
-            url: "http://119.36.93.103:30779/video?proName=guidao&chanName=AK0868434_1",
+            url: "https://monitor.ridp.0xcafebabe.cn/video?proName=guidao&chanName=AK0868434_1",
             name: "武广高铁淦河连续梁桥摄像头1"
         },
         {
-            url: "http://119.36.93.103:30779/video?proName=guidao&chanName=AK0868423_1",
+            url: "https://monitor.ridp.0xcafebabe.cn/video?proName=guidao&chanName=AK0868423_1",
             name: "武广高铁枫树下大桥摄像头"
         },
         {
-            url: "http://119.36.93.103:30779/video?proName=guidao&chanName=FB1667544_1",
+            url: "https://monitor.ridp.0xcafebabe.cn/video?proName=guidao&chanName=FB1667544_1",
             name: "武广高铁行将山1号隧道工点"
         }
     ];
