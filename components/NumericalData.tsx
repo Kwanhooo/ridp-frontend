@@ -33,7 +33,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useEffect, useState } from "react";
-import { get } from "@/app/uitils/HttpAxios";
+import { get } from "@/app/utils/HttpAxios";
 
 type NumericalDataType = {
   Bridge: string;

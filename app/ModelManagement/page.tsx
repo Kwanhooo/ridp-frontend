@@ -3,9 +3,9 @@
 
 import { useState, useEffect } from "react";
 
-import { OriginalLineChart, HandledLineChart } from "@/components/LineChart";
-import ChartSetting from "@/components/ChartSettting";
-import { get } from "../uitils/HttpAxios";
+import { OriginalLineChart, HandledLineChart, BigLineChart } from "@/components/LineChart";
+import ChartSetting from "@/components/ChartSetting";
+import { get } from "../utils/HttpAxios";
 
 type OriginalData = {
   FileContent: {
@@ -305,43 +305,53 @@ const Page = () => {
     // },
   ];
 
-  const handleSubmit = async () => {
-    // 获取图表数据
-    // try {
-    //   if (selectedTime !== undefined) {
-    //     const response = await get<OriginalData>("metrics", {
-    //       bridge: selectedBridge,
-    //       time: selectedTime,
-    //       type: selectedMetric,
-    //     });
-    //     console.log(response);
-    //     setOriginChartData(response);
-    //   }
-    // } catch (error) {
-    //   console.error("Error fetching chart data:", error);
-    // }
-  };
 
   return (
     <div className="flex flex-col h-screen">
       <div className="h-1/8 p-2 border-b border-gray-700">
-        <ChartSetting selects={selects} submit={handleSubmit} />
+        <ChartSetting selects={selects} />
       </div>
 
-      <div className="flex flex-col h-7/8 p-2 w-full space-y-2">
-        <div className="h-1/2">
+      <div className="grid grid-rows-3 gap-4 h-7/8 p-2 w-full">
+        {/* <div>
           <OriginalLineChart
             data={originChartData}
             title="原始数据"
           ></OriginalLineChart>
         </div>
-        <div className="h-1/2">
-          <HandledLineChart
-            cutData={cutChartData}
-            filterData={filterChartData}
-            title="模型数据"
-          ></HandledLineChart>
+        <div>
+          <OriginalLineChart
+            data={originChartData}
+            title="清洗数据"
+          ></OriginalLineChart>
         </div>
+        <div>
+          <OriginalLineChart
+            data={originChartData}
+            title="原始数据"
+          ></OriginalLineChart>
+        </div>
+        <div>
+          <OriginalLineChart
+            data={originChartData}
+            title="切割数据"
+          ></OriginalLineChart>
+        </div>
+        <div>
+          <OriginalLineChart
+            data={originChartData}
+            title="切割数据"
+          ></OriginalLineChart>
+        </div>
+        <div>
+          <OriginalLineChart
+            data={originChartData}
+            title="平滑数据"
+          ></OriginalLineChart>
+        </div> */}
+      <BigLineChart original_data={originChartData} handled_data={cutChartData} title="清洗模型"></BigLineChart>
+      <BigLineChart original_data={originChartData} handled_data={cutChartData} title="切割模型"></BigLineChart>
+      <BigLineChart original_data={originChartData} handled_data={cutChartData} title="平滑数据"></BigLineChart>
       </div>
     </div>
   );

@@ -15,6 +15,13 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
+import {
+  Select,
+  SelectTrigger,
+  SelectContent,
+  SelectItem,
+  SelectValue,
+} from "@/components/ui/select";
 
 import { useEffect, useState } from "react";
 
@@ -74,6 +81,18 @@ export function OriginalLineChart({
         <div className="flex flex-1 flex-col justify-center gap-1 px-12">
           <CardTitle>{title}</CardTitle>
           <CardDescription>{data.FileName}</CardDescription>
+        </div>
+        <div className="flex flex-1 flex-col justify-center">
+          <Select>
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="模型选择" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="light">Light</SelectItem>
+              <SelectItem value="dark">Dark</SelectItem>
+              <SelectItem value="system">System</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
       </CardHeader>
       <CardContent className="px-1 sm:p-2 h-3/4">
@@ -149,8 +168,6 @@ export function HandledLineChart({
   useEffect(() => {
     setSelectedData(cutData.data);
   }, [cutData.data]);
-  console.log(cutData.data);
-  console.log(selectedData);
 
   return (
     <Card className="h-full">
@@ -234,6 +251,151 @@ export function HandledLineChart({
               dot={false}
             />
           </LineChart>
+        </ChartContainer>
+      </CardContent>
+    </Card>
+  );
+}
+
+export function BigLineChart({
+  title,
+  original_data = {
+    FileContent: [],
+    FileName: "",
+  },
+  handled_data = {
+    data: [],
+    status: "",
+  },
+}: {
+  title: string;
+  original_data: {
+    FileContent: {
+      time: string;
+      value: number;
+    }[];
+    FileName: string;
+  };
+  handled_data: {
+    data: { time: string; value: number }[];
+    status: string;
+    max_value?: number;
+  };
+}) {
+  return (
+    <Card className="h-full w-full">
+      <CardHeader className="flex flex-col items-stretch space-y-0 border-b p-0 sm:flex-row h-1/4">
+        <div className="flex flex-1 flex-col justify-center gap-1 px-12">
+          <CardTitle>{title}</CardTitle>
+        </div>
+        <div className="flex flex-1 flex-col justify-center">
+          <Select>
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="模型选择" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="light">Light</SelectItem>
+              <SelectItem value="dark">Dark</SelectItem>
+              <SelectItem value="system">System</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+      </CardHeader>
+      <CardContent className="px-1 sm:p-2 h-3/4">
+        <ChartContainer
+          config={chartConfig}
+          className="w-full aspect-auto h-full"
+        >
+          <div className="grid grid-cols-2 gap-2 p-1">
+            <LineChart
+              accessibilityLayer
+              data={original_data.FileContent}
+              margin={{
+                left: 12,
+                right: 12,
+              }}
+            >
+              <CartesianGrid vertical={false} />
+              <XAxis
+                dataKey="time"
+                tickLine={false}
+                axisLine={false}
+                tickMargin={8}
+                minTickGap={32}
+                tickFormatter={(value) => value.slice(11, 23)}
+              />
+              <YAxis />
+              <ChartTooltip
+                content={
+                  <ChartTooltipContent
+                    className="w-[150px]"
+                    nameKey="views"
+                    labelFormatter={(value) => {
+                      return new Date(value).toLocaleDateString("zh-CN", {
+                        second: "numeric",
+                        minute: "numeric",
+                        hour: "numeric",
+                        month: "short",
+                        day: "numeric",
+                        year: "numeric",
+                      });
+                    }}
+                  />
+                }
+              />
+              <Line
+                dataKey="value"
+                type="monotone"
+                stroke={chartConfig.value.color}
+                strokeWidth={2}
+                dot={false}
+              />
+            </LineChart>
+            <LineChart
+              accessibilityLayer
+              data={handled_data.data}
+              margin={{
+                left: 12,
+                right: 12,
+              }}
+            >
+              <CartesianGrid vertical={false} />
+              <XAxis
+                dataKey="time"
+                tickLine={false}
+                axisLine={false}
+                tickMargin={8}
+                minTickGap={32}
+                tickFormatter={(value) => value.slice(11, 23)}
+              />
+              <YAxis />
+              <ChartTooltip
+                content={
+                  <ChartTooltipContent
+                    className="w-[150px]"
+                    nameKey="views"
+                    labelFormatter={(value) => {
+                      return new Date(value).toLocaleDateString("zh-CN", {
+                        second: "numeric",
+                        minute: "numeric",
+                        hour: "numeric",
+                        month: "short",
+                        day: "numeric",
+                        year: "numeric",
+                      });
+                    }}
+                  />
+                }
+              />
+              <Line
+                dataKey="value"
+                type="monotone"
+                stroke={chartConfig.cut.color}
+                strokeWidth={2}
+                dot={false}
+              />
+            </LineChart>
+          </div>
         </ChartContainer>
       </CardContent>
     </Card>

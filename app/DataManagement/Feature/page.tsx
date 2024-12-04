@@ -4,28 +4,36 @@ import { get } from "@/app/utils/HttpAxios";
 import ChartSetting from "@/components/ChartSetting";
 import { useEffect, useState } from "react";
 import { MyTable } from "@/components/MyTable";
-import { Model, columns, ModelSchema } from "@/components/columns/ModelColumn";
+import {
+  Feature,
+  columns,
+  FeatureSchema,
+} from "@/components/columns/FeatureColumn";
 import { z } from "zod";
+import { formatTime } from "@/app/utils/util";
 
 const Page = () => {
   const [selectedBridge, setSelectedBridge] = useState<string>("");
   const [bridgeOptions, setBridgeOptions] = useState<string[]>([]);
 
-  const [selectedModelType, setSelectedModelType] =
-    useState<string>("清洗模型");
-  const [modelTypeOptions] = useState<string[]>([
-    "清洗模型",
-    "切割模型",
-    "平滑模型",
+  const [selectedFeatureModelType, setSelectedFeatureModelType] =
+    useState<string>("矩阵数据");
+  const [featureModelTypeOptions] = useState<string[]>([
+    "矩阵数据",
+    "时序图数据",
+    "向量数据",
   ]);
 
-  const [selectedModelName, setSelectedModelName] = useState<string>("模型1");
-  const [modelNameOptions] = useState<string[]>(["模型1", "模型2", "模型3"]);
+  const [selectedPassTime, setSelectedPassTime] = useState<string>("");
+  const [passTimeOptions, setPassTimeOptions] = useState<string[]>([]);
+
+  const [selectedPassEndTime, setSelectedPassEndTime] = useState<string>("");
+  const [passEndTimeOptions, setPassEndTimeOptions] = useState<string[]>([]);
 
   const [selectedPointName, setSelectedPointName] = useState<string>("");
-  const [PointNameOptions, setPointNameOptions] = useState<string[]>([]);
+  const [pointNameOptions, setPointNameOptions] = useState<string[]>([]);
 
-  const [data, setData] = useState<Model[]>([]);
+  const [data, setData] = useState<Feature[]>([]);
 
   const [page, setPage] = useState<number>(1);
   const [pageSize, setPageSize] = useState<number>(10);
@@ -44,7 +52,7 @@ const Page = () => {
     fetch_data();
   }, []);
 
-  // Fetch point name options when selectedBridge changes
+  // Fetch point name and pass time options when selectedBridge changes
   useEffect(() => {
     const fetch_point_name_options = async () => {
       try {
@@ -53,6 +61,19 @@ const Page = () => {
         });
         setSelectedPointName(point_name_options[0]);
         setPointNameOptions(point_name_options);
+
+        const pass_time_option = await get<string[]>("times", {
+          bridge: selectedBridge,
+        });
+        setSelectedPassTime(pass_time_option[0]);
+        setPassTimeOptions(pass_time_option);
+
+        setSelectedPassEndTime(
+          pass_time_option.length > 1
+            ? pass_time_option[1]
+            : pass_time_option[0]
+        );
+        setPassEndTimeOptions(pass_time_option);
       } catch (error) {
         console.error("Error fetching time options:", error);
       }
@@ -60,33 +81,42 @@ const Page = () => {
     fetch_point_name_options();
   }, [selectedBridge]);
 
-  // get model data
+  // get feature data
   useEffect(() => {
     const fetchData = async () => {
-      if (selectedPointName && selectedPointName !== "") {
+      if (selectedPointName) {
         try {
-          const model_data = await get<Model[]>("model_manage", {
+          const feature_data = await get<Feature[]>("feature_manage", {
             page: page,
             pageSize: pageSize,
-            modelType: selectedModelType,
-            modelName: selectedModelName,
+            bridgeName: selectedBridge,
+            featureModelType: selectedFeatureModelType,
             pointName: selectedPointName,
+            passTime: formatTime(selectedPassTime),
+            passEndTime: formatTime(selectedPassEndTime),
           });
 
-          setData(z.array(ModelSchema).parse(model_data));
+          setData(z.array(FeatureSchema).parse(feature_data));
         } catch (error) {
           console.error("Error fetching data:", error);
         }
       }
     };
     fetchData();
-  }, [page, pageSize, selectedModelType, selectedModelName, selectedPointName]);
+  }, [
+    selectedBridge,
+    selectedFeatureModelType,
+    selectedPointName,
+    page,
+    pageSize,
+    selectedPassTime,
+    selectedPassEndTime,
+  ]);
 
   const handlePageChange = (newPage: number, newPageSize: number) => {
     setPage(newPage);
     setPageSize(newPageSize);
     console.log(`Page: ${newPage}, PageSize: ${newPageSize}`);
-    
   };
 
   const selects = [
@@ -97,20 +127,26 @@ const Page = () => {
       onChange: setSelectedBridge,
     },
     {
-      label: "模型类型",
-      options: modelTypeOptions,
-      defaultValue: selectedModelType,
-      onChange: setSelectedModelType,
+      label: "特征模型类型",
+      options: featureModelTypeOptions,
+      defaultValue: selectedFeatureModelType,
+      onChange: setSelectedFeatureModelType,
     },
     {
-      label: "模型名称",
-      options: modelNameOptions,
-      defaultValue: selectedModelName,
-      onChange: setSelectedModelName,
+      label: "Pass Time",
+      options: passTimeOptions,
+      defaultValue: selectedPassTime,
+      onChange: setSelectedPassTime,
+    },
+    {
+      label: "Pass End Time",
+      options: passEndTimeOptions,
+      defaultValue: selectedPassEndTime,
+      onChange: setSelectedPassEndTime,
     },
     {
       label: "Point Name",
-      options: PointNameOptions,
+      options: pointNameOptions,
       defaultValue: selectedPointName,
       onChange: setSelectedPointName,
     },

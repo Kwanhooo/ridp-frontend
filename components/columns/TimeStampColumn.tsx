@@ -2,29 +2,24 @@ import { ColumnDef } from "@tanstack/react-table";
 
 import { Checkbox } from "@/components/ui/checkbox";
 
-import { DataTableColumnHeader } from "./data-table-column-header";
-import { DataTableRowActions } from "./data-table-row-actions";
+import { DataTableColumnHeader } from "../TableHeader";
 
 import { z } from "zod";
 import { Badge } from "@/components/ui/badge";
 import Image from "next/image";
 
 import { AspectRatio } from "@/components/ui/aspect-ratio";
-
-const timestampdemo = {
-  bridgeId: "6684",
-  bridgeName: "某城际铁路简支梁桥与路桥过渡段",
-  clean_result: null,
-  dataProcessedURL: null,
-  id: "10008",
-  log: null,
-  pass_end_time: "Wed, 06 Nov 2024 19:07:57 GMT",
-  pass_time: "Wed, 06 Nov 2024 19:07:42 GMT",
-  pointCode: "GDBLDWY02",
-  pointId: "27068",
-  pointName: "过渡段轨道板两端垂向位移2",
-  tsPicURL: null,
-};
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuLabel,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuShortcut,
+} from "@/components/ui/dropdown-menu";
+import { Button } from "../ui/button";
+import { MoreHorizontal } from "lucide-react";
 
 export const TimeStampSchema = z.object({
   bridgeId: z.string(),
@@ -74,7 +69,7 @@ export const columns: ColumnDef<TimeStamp>[] = [
       <DataTableColumnHeader column={column} title="Bridge ID" />
     ),
     cell: ({ row }) => (
-      <div className="w-[80px]">{row.getValue("bridgeId")}</div>
+      <div className="w-[100px]">{row.getValue("bridgeId")}</div>
     ),
     enableSorting: false,
     enableHiding: false,
@@ -236,17 +231,19 @@ export const columns: ColumnDef<TimeStamp>[] = [
   {
     accessorKey: "tsPicURL",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Log" />
+      <DataTableColumnHeader column={column} title="Picture" />
     ),
     cell: ({ row }) => {
-      const url = row.getValue("tsPicURL");
-      // todo 可能需要判断url
-      return url ? (
-        <Badge variant="outline">NULL</Badge>
-      ) : (
+      const url = row.getValue("tsPicURL") as string | null | undefined;
+
+      if (!url) {
+        return <Badge variant="outline">NULL</Badge>;
+      }
+
+      return (
         <div className="w-[100px]">
           <AspectRatio ratio={16 / 9}>
-            <Image src="..." alt="Image" className="rounded-md object-cover" />
+            <Image src={url} alt="Image" width={100} height={56} />
           </AspectRatio>
         </div>
       );
@@ -255,6 +252,35 @@ export const columns: ColumnDef<TimeStamp>[] = [
 
   {
     id: "actions",
-    cell: ({ row }) => <DataTableRowActions row={row} />,
+    cell: ({ row }) => {
+      const model = row.original;
+
+      return (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" className="h-8 w-8 p-0">
+              <span className="sr-only">Open menu</span>
+              <MoreHorizontal className="h-4 w-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-[160px]">
+            <DropdownMenuLabel>Actions</DropdownMenuLabel>
+            <DropdownMenuItem
+              onClick={() =>
+                navigator.clipboard.writeText(JSON.stringify(model))
+              }
+            >
+              Copy
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem>Edit</DropdownMenuItem>
+            <DropdownMenuItem>
+              Delete
+              <DropdownMenuShortcut>⌘⌫</DropdownMenuShortcut>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      );
+    },
   },
 ];

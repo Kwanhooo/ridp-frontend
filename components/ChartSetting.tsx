@@ -17,18 +17,25 @@ interface SelectOption {
     defaultValue: string;
     onChange: Dispatch<SetStateAction<string>>;
   }[];
-  submit: () => void;
+  // submit: () => void;
 }
 
-export default function ChartSetting({ selects, submit }: SelectOption) {
+export default function ChartSetting({ selects }: SelectOption) {
+  const column_map = {
+    "3": "grid grid-cols-3 gap-4 p-1",
+    "4": "grid grid-cols-4 gap-4 p-1",
+    "5": "grid grid-cols-5 gap-4 p-1",
+    "6": "grid grid-cols-6 gap-4 p-1",
+  };
+  const index = selects.length.toString() as keyof typeof column_map;
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 p-1">
+    <div className={column_map[index]}>
       {selects.map((x) => (
         <div key={x.label}>
           <Select
             value={x.defaultValue}
             onValueChange={(value) => {
-              submit();
+              // submit();
               x.onChange(value);
             }}
           >
