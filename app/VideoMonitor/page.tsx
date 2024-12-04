@@ -25,7 +25,7 @@ const MonitorPage = () => {
         <div className="w-full h-full overflow-auto space-y-8 p-6 px-[10%]">
             <div className="flex justify-between gap-6">
                 {liveStream.slice(0, 2).map((obj, index) => (
-                    <div key={index} className="w-1/2 shadow-md rounded-lg overflow-hidden">
+                    <div key={index} className="w-1/2 rounded-lg overflow-hidden">
                         <div className="text-xl font-bold mb-1">{obj.name}</div>
                         <iframe
                             src={obj.url}
@@ -41,7 +41,7 @@ const MonitorPage = () => {
 
             <div className="flex justify-between gap-6">
                 {liveStream.slice(2, 4).map((obj, index) => (
-                    <div key={index} className="w-1/2 shadow-md rounded-lg overflow-hidden">
+                    <div key={index} className="w-1/2 rounded-lg overflow-hidden">
                         <div className="text-xl font-bold mb-1">{obj.name}</div>
                         <iframe
                             src={obj.url}
