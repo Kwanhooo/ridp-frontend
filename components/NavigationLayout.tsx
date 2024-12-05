@@ -35,7 +35,7 @@ const NavigationLayout = ({children}: { children: React.ReactNode }) => {
         {name: "视频监控", path: "/VideoMonitor"},
         {name: "过车监控", path: "/DataMonitor"},
         // {name: "数据查询", path: "/DataDashboard"},
-        {name: "数据治理", path: "/DataGovernance"},
+        // {name: "数据治理", path: "/DataGovernance"},
         {name: "模型管理", path: "/ModelManagement"},
         {name: "数据管理", path: "#"},
     ];

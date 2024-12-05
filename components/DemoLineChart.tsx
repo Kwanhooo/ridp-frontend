@@ -1,9 +1,9 @@
 import * as React from "react";
 import 'react-toastify/dist/ReactToastify.css'; // 引入样式
 import NoHeadLineChart from '@/components/NoHeadLineChart';
-import {get} from "@/app/uitils/HttpAxios";
+import {get} from "@/app/utils/HttpAxios";
 import {ChartData} from "@/types/ChartData";
-import {showErrorToast} from "@/app/uitils/toast";
+import {showErrorToast} from "@/app/utils/toast";
 
 // API响应类型
 type MetricsResponse = { time: string | Date; value: number; }[];

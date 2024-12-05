@@ -18,8 +18,8 @@ import {
 } from "@tanstack/react-table"
 import {Checkbox} from "@/components/ui/checkbox"
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow,} from "@/components/ui/table"
-import {get} from "@/app/uitils/HttpAxios";
-import {showErrorToast} from "@/app/uitils/toast";
+import {get} from "@/app/utils/HttpAxios"
+import {showErrorToast} from "@/app/utils/toast";
 import DemoLineChart from "@/components/DemoLineChart";
 import {setSidebarState} from "@/store/modules/sidebarSlice";
 import {useDispatch} from "react-redux";

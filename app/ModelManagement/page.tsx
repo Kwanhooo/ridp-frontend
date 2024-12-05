@@ -6,6 +6,7 @@ import { useState, useEffect } from "react";
 import { OriginalLineChart, HandledLineChart, BigLineChart } from "@/components/LineChart";
 import ChartSetting from "@/components/ChartSetting";
 import { get } from "../utils/HttpAxios";
+import {formatTime} from "@/app/utils/util"
 
 type OriginalData = {
   FileContent: {
@@ -54,6 +55,7 @@ const Page = () => {
   useEffect(() => {
     const fetch_data = async () => {
       try {
+
         const bridge_options = await get<string[]>("bridges");
         setSelectedBridge(bridge_options[0]);
         setBridgeOptions(bridge_options);
@@ -64,9 +66,7 @@ const Page = () => {
         // setSelectedTime(time_options[0]);
         // setTimeOptions(time_options);
 
-        const metric_options = await get<string[]>("types");
-        setSelectedMetric(metric_options[0]);
-        setMetricOptions(metric_options);
+
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -75,16 +75,26 @@ const Page = () => {
   }, []);
   // Fetch time options when selectedBridge changes
   useEffect(() => {
+
     const fetch_time_options = async () => {
-      try {
-        const time_options = await get<string[]>("times", {
-          bridge: selectedBridge,
-        });
-        setSelectedTime(time_options[0]);
-        setTimeOptions(time_options);
-      } catch (error) {
-        console.error("Error fetching time options:", error);
+      if (selectedBridge && selectedBridge !== ""){
+        try {
+          const time_options = await get<string[]>("times", {
+            bridge: selectedBridge,
+          });
+          setSelectedTime(time_options[0]);
+          setTimeOptions(time_options);
+
+          const point_name_options = await get<string[]>("pointName", {
+            bridge: selectedBridge,
+          });
+          setSelectedMetric(point_name_options[0]);
+          setMetricOptions(point_name_options);
+        } catch (error) {
+          console.error("Error fetching time options:", error);
+        }
       }
+
     };
     fetch_time_options();
   }, [selectedBridge]);
@@ -161,25 +171,28 @@ const Page = () => {
             await Promise.all([
               get<{ FileContent: string; FileName: string }>("metrics", {
                 bridge: selectedBridge,
-                time: selectedTime,
+                time: formatTime(selectedTime),
                 type: selectedMetric,
               }),
-              get<HandledData>("model-management/cut", {
+              get<HandledData>("data_process/cut", {
                 bridge: selectedBridge,
-                time: selectedTime,
-                type: selectedMetric,
-                Parameters: JSON.stringify({
-                  threshold: [0.01, 0.01, 0.01, 0.01],
-                  extension: 0.05,
-                }),
+                time: formatTime(selectedTime),
+                // type: selectedMetric,
+                // Parameters: JSON.stringify({
+                //   threshold: [0.01, 0.01, 0.01, 0.01],
+                //   extension: 0.05,
+                // }),
+                modelName:"模型1",
+                pointName: selectedMetric
               }),
-              get<HandledData>("model-management/filter", {
+              get<HandledData>("data_process/filter", {
                 bridge: selectedBridge,
-                time: selectedTime,
-                type: selectedMetric,
-                Parameters: JSON.stringify({
-                  window_size: 100,
-                }),
+                time: formatTime(selectedTime),
+                pointName: selectedMetric,
+                // Parameters: JSON.stringify({
+                //   window_size: 100,
+                // }),
+                modelName:"模型1"
               }),
             ]);
 
