@@ -146,7 +146,7 @@ const DataDashboard = () => {
     }, []);
 
     return (
-        <div className="h-full flex flex-col bg-black">
+        <div className="h-full flex flex-col">
             {/* Toast 容器 */}
             <ToastContainer/>
 
@@ -154,11 +154,11 @@ const DataDashboard = () => {
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 border-b border-gray-700 p-2 pb-3">
                 {/* 桥梁选择 */}
                 <div className="flex items-start flex-col">
-                    <label htmlFor="bridge" className="text-white font-bold px-2">
+                    <label htmlFor="bridge" className=" font-bold px-2">
                         桥梁
                     </label>
                     <Select onValueChange={(value) => setSelectedBridge(value)}>
-                        <SelectTrigger className="w-[250px] text-white">
+                        <SelectTrigger className="w-[250px] ">
                             <SelectValue placeholder="选择桥梁"/>
                         </SelectTrigger>
                         <SelectContent>
@@ -176,11 +176,11 @@ const DataDashboard = () => {
 
                 {/* 时间选择 */}
                 <div className="flex items-start flex-col">
-                    <label htmlFor="time" className="text-white font-bold px-2">
+                    <label htmlFor="time" className=" font-bold px-2">
                         时间
                     </label>
                     <Select onValueChange={(value) => setSelectedTime(value)}>
-                        <SelectTrigger className="w-[250px] text-white">
+                        <SelectTrigger className="w-[250px] ">
                             <SelectValue placeholder="选择时间"/>
                         </SelectTrigger>
                         <SelectContent>
@@ -198,11 +198,11 @@ const DataDashboard = () => {
 
                 {/* 指标选择 */}
                 <div className="flex items-start flex-col">
-                    <label htmlFor="indicator" className="text-white font-bold px-2">
+                    <label htmlFor="indicator" className=" font-bold px-2">
                         指标
                     </label>
                     <Select onValueChange={(value) => setSelectedType(value)}>
-                        <SelectTrigger className="w-[250px] text-white">
+                        <SelectTrigger className="w-[250px] ">
                             <SelectValue placeholder="选择指标"/>
                         </SelectTrigger>
                         <SelectContent>

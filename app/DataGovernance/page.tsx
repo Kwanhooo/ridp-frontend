@@ -25,8 +25,10 @@ type RawDataResponse = { FileName: string; FileContent: string; };
 type ProcessedDataResponse = { data: { time: string, value: number }[]; max_abs: number; status: string; };
 type CleanDataResponse = { result: { [key: string]: string | boolean }; status: string };
 
+type ModelOption = { value: string; label: string };
+
 const initChartData = {title: "", content: []} as ChartData;
-const containerStyle = {height: 'calc(100% - 102px)', minHeight: '300px'};
+const containerStyle = {height: 'calc(100% - 102px)', maxHeight: '300px'};
 const wrapperStyle = {height: 'calc(100% - 85px)', minHeight: '300px'};
 
 // 数据获取函数
@@ -46,14 +48,17 @@ const Page = () => {
     const [timeOptions, setTimeOptions] = React.useState<string[]>([]);
     const [selectedType, setSelectedType] = React.useState('');
     const [typeOptions, setTypeOptions] = React.useState<string[]>([]);
-    const [, setSelectedThreshold] = React.useState<string>();
-    const [, setSelectedWindowSize] = React.useState<string>();
-    const [, setSelectedExtension] = React.useState<string>();
+    const [selectedModel, setSelectedModel] = React.useState('');
     const [rawData, setRawData] = React.useState(initChartData);
     const [cleanData, setCleanData] = React.useState<CleanDataResponse | null>(null);
     const [filteredData, setFilteredData] = React.useState(initChartData);
     const [processData, setProcessData] = React.useState(initChartData);
     const [loadingOptions, setLoadingOptions] = React.useState(true);
+
+    const modelOptions: ModelOption[] = Array.from({length: 57}, (_, i) => ({
+        value: `模型${i + 1}`,
+        label: `模型${i + 1}`
+    }));
 
     const loadData = async () => {
         if (selectedBridge && selectedTime && selectedType) {
@@ -85,7 +90,7 @@ const Page = () => {
                     return;
                 }
 
-                const filteredDataResponse = await fetchData<ProcessedDataResponse>('/model-management/process', {
+                const filteredDataResponse = await fetchData<ProcessedDataResponse>('/model-management/cut', {
                     bridge: selectedBridge,
                     time: selectedTime,
                     type: selectedType,
@@ -93,7 +98,7 @@ const Page = () => {
                 });
                 setFilteredData({title: filteredDataResponse.max_abs, content: filteredDataResponse.data});
 
-                const processDataResponse = await fetchData<ProcessedDataResponse>('/model-management/filter', {
+                const processDataResponse = await fetchData<ProcessedDataResponse>('/model-management/process', {
                     bridge: selectedBridge,
                     time: selectedTime,
                     type: selectedType,
@@ -139,17 +144,17 @@ const Page = () => {
     }, [selectedBridge, selectedTime, selectedType]);
 
     return (
-        <div className="h-full bg-black">
+        <div className="h-full">
             <ToastContainer/>
             {loadingOptions ? (
-                <div className="text-white text-center p-4">加载选项中...</div>
+                <div className=" text-center p-4">加载选项中...</div>
             ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-6 gap-4 p-2 pb-3 border-b-[1px] border-gray-600">
                     {/* 桥梁选择器 */}
                     <div className="flex items-start flex-col">
-                        <label className="text-white font-bold px-2">桥梁</label>
+                        <label className=" font-bold px-2">桥梁</label>
                         <Select onValueChange={setSelectedBridge}>
-                            <SelectTrigger className="w-[180px] text-white">
+                            <SelectTrigger className="w-[180px] ">
                                 <SelectValue placeholder="选择桥梁"/>
                             </SelectTrigger>
                             <SelectContent>
@@ -165,9 +170,9 @@ const Page = () => {
 
                     {/* 时间选择器 */}
                     <div className="flex items-start flex-col">
-                        <label className="text-white font-bold px-2">时间</label>
+                        <label className=" font-bold px-2">时间</label>
                         <Select onValueChange={setSelectedTime}>
-                            <SelectTrigger className="w-[180px] text-white">
+                            <SelectTrigger className="w-[180px] ">
                                 <SelectValue placeholder="选择时间"/>
                             </SelectTrigger>
                             <SelectContent>
@@ -183,9 +188,9 @@ const Page = () => {
 
                     {/* 指标选择器 */}
                     <div className="flex items-start flex-col">
-                        <label className="text-white font-bold px-2">指标</label>
+                        <label className=" font-bold px-2">指标</label>
                         <Select onValueChange={setSelectedType}>
-                            <SelectTrigger className="w-[180px] text-white">
+                            <SelectTrigger className="w-[180px] ">
                                 <SelectValue placeholder="选择指标"/>
                             </SelectTrigger>
                             <SelectContent>
@@ -199,54 +204,18 @@ const Page = () => {
                         </Select>
                     </div>
 
-                    {/* 阈值选择器 */}
+                    {/* 模型选择器 */}
                     <div className="flex items-start flex-col">
-                        <label className="text-white font-bold px-2">阈值</label>
-                        <Select onValueChange={setSelectedThreshold} defaultValue="0.01">
-                            <SelectTrigger className="w-[180px] text-white">
-                                <SelectValue placeholder="选择阈值"/>
+                        <label className=" font-bold px-2">模型</label>
+                        <Select onValueChange={setSelectedModel}>
+                            <SelectTrigger className="w-[180px] ">
+                                <SelectValue placeholder="选择模型"/>
                             </SelectTrigger>
                             <SelectContent>
                                 <SelectGroup>
-                                    <SelectLabel>阈值列表</SelectLabel>
-                                    {["0.01"].map(option => (
-                                        <SelectItem key={option} value={option}>{option}</SelectItem>
-                                    ))}
-                                </SelectGroup>
-                            </SelectContent>
-                        </Select>
-                    </div>
-
-                    {/* 窗口大小选择器 */}
-                    <div className="flex items-start flex-col">
-                        <label className="text-white font-bold px-2">窗口大小</label>
-                        <Select onValueChange={setSelectedWindowSize} defaultValue="100">
-                            <SelectTrigger className="w-[180px] text-white">
-                                <SelectValue placeholder="选择窗口大小"/>
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectGroup>
-                                    <SelectLabel>窗口大小列表</SelectLabel>
-                                    {["100"].map(option => (
-                                        <SelectItem key={option} value={option}>{option}</SelectItem>
-                                    ))}
-                                </SelectGroup>
-                            </SelectContent>
-                        </Select>
-                    </div>
-
-                    {/* 扩展选择器 */}
-                    <div className="flex items-start flex-col">
-                        <label className="text-white font-bold px-2">扩展</label>
-                        <Select onValueChange={setSelectedExtension} defaultValue="0.05">
-                            <SelectTrigger className="w-[180px] text-white">
-                                <SelectValue placeholder="选择扩展"/>
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectGroup>
-                                    <SelectLabel>扩展列表</SelectLabel>
-                                    {["0.05"].map(option => (
-                                        <SelectItem key={option} value={option}>{option}</SelectItem>
+                                    <SelectLabel>模型列表</SelectLabel>
+                                    {modelOptions.map(option => (
+                                        <SelectItem key={option.value} value={option.value}>{option.label}</SelectItem>
                                     ))}
                                 </SelectGroup>
                             </SelectContent>
@@ -277,7 +246,7 @@ const Page = () => {
                 <Card className="flex flex-col">
                     <CardHeader>
                         <CardTitle className="text-xl font-bold">数据清洗反馈</CardTitle>
-                        <CardDescription>{filteredData.title ? ("最大绝对值：" + filteredData.title) : "暂无数据"}</CardDescription>
+                        <CardDescription>{cleanData ? ("数据清洗完毕") : "尚未执行"}</CardDescription>
                     </CardHeader>
                     <CardContent style={containerStyle}>
                         <div className="h-full w-full flex justify-center items-center">
@@ -300,7 +269,7 @@ const Page = () => {
                 <Card className="flex flex-col">
                     <CardHeader>
                         <CardTitle className="text-xl font-bold">切割后数据</CardTitle>
-                        <CardDescription>{filteredData.title ? ("最大绝对值：" + filteredData.title) : "暂无数据"}</CardDescription>
+                        <CardDescription>{filteredData.title === undefined ? ("数据切割完毕") : "尚未执行"}</CardDescription>
                     </CardHeader>
                     <CardContent style={containerStyle}>
                         <div className="h-full w-full flex justify-center items-center">
@@ -316,7 +285,7 @@ const Page = () => {
                 <Card className="flex flex-col">
                     <CardHeader>
                         <CardTitle className="text-xl font-bold">平滑后数据</CardTitle>
-                        <CardDescription>{processData.title ? ("最大绝对值：" + processData.title) : "暂无数据"}</CardDescription>
+                        <CardDescription>{processData.title ? ("最大绝对值：" + processData.title) : "尚未执行"}</CardDescription>
                     </CardHeader>
                     <CardContent style={containerStyle}>
                         <div className="h-full w-full flex justify-center items-center">
