@@ -12,7 +12,8 @@ export const store = configureStore({
     reducer: rootReducer,
 });
 
-export function ReduxProvider({children}: never) {
+// @ts-ignore
+export function ReduxProvider({children}) {
     return <Provider store={store}>{children}</Provider>;
 }
 
