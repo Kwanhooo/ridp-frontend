@@ -42,16 +42,11 @@ const NavigationLayout = ({children}: { children: React.ReactNode }) => {
 
     // 数据管理下拉菜单选项
     const dataManagementOptions = [
-        {name: "数值数据", path: "/DataManagement/Numerical"},
-        {name: "模型数据", path: "/DataManagement/Model"},
-        {name: "时序图数据", path: "#"},
-        {name: "视频数据", path: "#"},
-        {name: "音频数据", path: "#"},
-        {name: "文本数据", path: "#"},
-        {name: "向量数据", path: "#"},
-        {name: "图片数据", path: "#"},
-        {name: "图谱数据", path: "#"},
-        {name: "表数据", path: "#"},
+        { name: "时序数据", path: "/DataManagement/TimeStamp" },
+        { name: "模型数据", path: "/DataManagement/Model" },
+        { name: "特征数据", path: "/DataManagement/Feature" },
+        { name: "多媒体数据", path: "/DataManagement/MultiMedia" },
+        { name: "文本数据", path: "/DataManagement/Text" },
     ];
 
     return (
