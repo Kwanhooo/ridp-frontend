@@ -3,7 +3,11 @@
 
 import { useState, useEffect } from "react";
 
-import { OriginalLineChart, HandledLineChart, BigLineChart } from "@/components/LineChart";
+import {
+  OriginalLineChart,
+  HandledLineChart,
+  BigLineChart,
+} from "@/components/LineChart";
 import ChartSetting from "@/components/ChartSetting";
 import { get } from "../utils/HttpAxios";
 
@@ -63,10 +67,6 @@ const Page = () => {
         // });
         // setSelectedTime(time_options[0]);
         // setTimeOptions(time_options);
-
-        const metric_options = await get<string[]>("types");
-        setSelectedMetric(metric_options[0]);
-        setMetricOptions(metric_options);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -76,14 +76,22 @@ const Page = () => {
   // Fetch time options when selectedBridge changes
   useEffect(() => {
     const fetch_time_options = async () => {
-      try {
-        const time_options = await get<string[]>("times", {
-          bridge: selectedBridge,
-        });
-        setSelectedTime(time_options[0]);
-        setTimeOptions(time_options);
-      } catch (error) {
-        console.error("Error fetching time options:", error);
+      if (selectedBridge && selectedBridge !== "") {
+        try {
+          const time_options = await get<string[]>("times", {
+            bridge: selectedBridge,
+          });
+          setSelectedTime(time_options[0]);
+          setTimeOptions(time_options);
+
+          const metric_options = await get<string[]>("pointName", {
+            bridge: selectedBridge,
+          });
+          setSelectedMetric(metric_options[0]);
+          setMetricOptions(metric_options);
+        } catch (error) {
+          console.error("Error fetching time options:", error);
+        }
       }
     };
     fetch_time_options();
@@ -305,7 +313,6 @@ const Page = () => {
     // },
   ];
 
-
   return (
     <div className="flex flex-col h-screen">
       <div className="h-1/8 p-2 border-b border-gray-700">
@@ -349,9 +356,21 @@ const Page = () => {
             title="平滑数据"
           ></OriginalLineChart>
         </div> */}
-      <BigLineChart original_data={originChartData} handled_data={cutChartData} title="清洗模型"></BigLineChart>
-      <BigLineChart original_data={originChartData} handled_data={cutChartData} title="切割模型"></BigLineChart>
-      <BigLineChart original_data={originChartData} handled_data={cutChartData} title="平滑数据"></BigLineChart>
+        <BigLineChart
+          original_data={originChartData}
+          handled_data={cutChartData}
+          title="清洗模型"
+        ></BigLineChart>
+        <BigLineChart
+          original_data={originChartData}
+          handled_data={cutChartData}
+          title="切割模型"
+        ></BigLineChart>
+        <BigLineChart
+          original_data={originChartData}
+          handled_data={cutChartData}
+          title="平滑数据"
+        ></BigLineChart>
       </div>
     </div>
   );
