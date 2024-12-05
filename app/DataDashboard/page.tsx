@@ -13,10 +13,10 @@ import {
 } from "@/components/ui/select";
 import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card";
 import NoHeadLineChart from '@/components/NoHeadLineChart';
-import {get} from "@/app/uitils/HttpAxios";
+import {get} from "@/app/utils/HttpAxios";
 import Spinner from "@/components/Spinner";
 import {ChartData} from "@/types/ChartData";
-import {showErrorToast} from "@/app/uitils/toast";
+import {showErrorToast} from "@/app/utils/toast";
 
 /**
  * 类型定义

@@ -12,10 +12,10 @@ import {
     SelectValue
 } from "@/components/ui/select";
 import {ChartData} from "@/types/ChartData";
-import {get} from "@/app/uitils/HttpAxios";
+import {get} from "@/app/utils/HttpAxios";
 import {ToastContainer} from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
-import {showErrorToast} from "@/app/uitils/toast";
+import {showErrorToast} from "@/app/utils/toast";
 
 // 数据类型声明
 type BridgeListResponse = string[];
