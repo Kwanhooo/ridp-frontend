@@ -75,7 +75,7 @@ export const columns: ColumnDef<TimeStamp>[] = [
     enableHiding: false,
   },
   {
-    accessorKey: "BridgeName",
+    accessorKey: "bridgeName",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Name" />
     ),
@@ -83,7 +83,7 @@ export const columns: ColumnDef<TimeStamp>[] = [
       return (
         <div className="flex space-x-2">
           <span className="max-w-[500px] truncate font-medium">
-            {row.getValue("BridgeName")}
+            {row.getValue("bridgeName")}
           </span>
         </div>
       );
@@ -98,11 +98,11 @@ export const columns: ColumnDef<TimeStamp>[] = [
       return (
         <div className="flex space-x-2">
           {row.getValue("clean_result") ? (
-            <Badge variant="outline">NULL</Badge>
-          ) : (
             <span className="max-w-[500px] truncate font-medium">
               {row.getValue("clean_result")}
             </span>
+          ) : (
+            <Badge variant="outline">NULL</Badge>
           )}
         </div>
       );

@@ -47,7 +47,8 @@ const Page = () => {
   // Fetch point name and pass [end] time options when selectedBridge changes
   useEffect(() => {
     const fetch_point_name_options = async () => {
-      try {
+      if (selectedBridge && selectedBridge !== "") {
+              try {
         const point_name_options = await get<string[]>("pointName", {
           bridge: selectedBridge,
         });
@@ -69,6 +70,8 @@ const Page = () => {
       } catch (error) {
         console.error("Error fetching time options:", error);
       }
+      }
+
     };
     fetch_point_name_options();
   }, [selectedBridge]);

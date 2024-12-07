@@ -259,29 +259,25 @@ export function HandledLineChart({
 
 export function BigLineChart({
   title,
-  original_data = {
-    FileContent: [],
-    FileName: "",
-  },
-  handled_data = {
-    data: [],
-    status: "",
-  },
+  original_data = [
+    { time: "2024-11-01 07:44:35.000", value: -0.000507008560277789 },
+    { time: "2024-11-01 07:44:35.000", value: -0.000507008560277789 },
+  ],
+  handled_data = [],
 }: {
   title: string;
   original_data: {
-    FileContent: {
-      time: string;
-      value: number;
-    }[];
-    FileName: string;
-  };
+    time: string;
+    value: number;
+  }[];
   handled_data: {
-    data: { time: string; value: number }[];
-    status: string;
-    max_value?: number;
-  };
+    time: string;
+    value: number;
+  }[];
 }) {
+  console.log(original_data);
+  console.log(handled_data);
+
   return (
     <Card className="h-full w-full">
       <CardHeader className="flex flex-col items-stretch space-y-0 border-b p-0 sm:flex-row h-1/4">
@@ -294,108 +290,111 @@ export function BigLineChart({
               <SelectValue placeholder="模型选择" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="light">Light</SelectItem>
-              <SelectItem value="dark">Dark</SelectItem>
-              <SelectItem value="system">System</SelectItem>
+              <SelectItem value="light">模型1</SelectItem>
+              <SelectItem value="dark">模型2</SelectItem>
+              <SelectItem value="system">模型3</SelectItem>
             </SelectContent>
           </Select>
         </div>
       </CardHeader>
-      <CardContent className="px-1 sm:p-2 h-3/4">
+      <CardContent className="px-1 sm:p-2 h-3/4 grid grid-cols-2 gap-2">
         <ChartContainer
           config={chartConfig}
           className="w-full aspect-auto h-full"
         >
-          <div className="grid grid-cols-2 gap-2 p-1">
-            <LineChart
-              accessibilityLayer
-              data={original_data.FileContent}
-              margin={{
-                left: 12,
-                right: 12,
-              }}
-            >
-              <CartesianGrid vertical={false} />
-              <XAxis
-                dataKey="time"
-                tickLine={false}
-                axisLine={false}
-                tickMargin={8}
-                minTickGap={32}
-                tickFormatter={(value) => value.slice(11, 23)}
-              />
-              <YAxis />
-              <ChartTooltip
-                content={
-                  <ChartTooltipContent
-                    className="w-[150px]"
-                    nameKey="views"
-                    labelFormatter={(value) => {
-                      return new Date(value).toLocaleDateString("zh-CN", {
-                        second: "numeric",
-                        minute: "numeric",
-                        hour: "numeric",
-                        month: "short",
-                        day: "numeric",
-                        year: "numeric",
-                      });
-                    }}
-                  />
-                }
-              />
-              <Line
-                dataKey="value"
-                type="monotone"
-                stroke={chartConfig.value.color}
-                strokeWidth={2}
-                dot={false}
-              />
-            </LineChart>
-            <LineChart
-              accessibilityLayer
-              data={handled_data.data}
-              margin={{
-                left: 12,
-                right: 12,
-              }}
-            >
-              <CartesianGrid vertical={false} />
-              <XAxis
-                dataKey="time"
-                tickLine={false}
-                axisLine={false}
-                tickMargin={8}
-                minTickGap={32}
-                tickFormatter={(value) => value.slice(11, 23)}
-              />
-              <YAxis />
-              <ChartTooltip
-                content={
-                  <ChartTooltipContent
-                    className="w-[150px]"
-                    nameKey="views"
-                    labelFormatter={(value) => {
-                      return new Date(value).toLocaleDateString("zh-CN", {
-                        second: "numeric",
-                        minute: "numeric",
-                        hour: "numeric",
-                        month: "short",
-                        day: "numeric",
-                        year: "numeric",
-                      });
-                    }}
-                  />
-                }
-              />
-              <Line
-                dataKey="value"
-                type="monotone"
-                stroke={chartConfig.cut.color}
-                strokeWidth={2}
-                dot={false}
-              />
-            </LineChart>
-          </div>
+          <LineChart
+            accessibilityLayer
+            data={original_data}
+            margin={{
+              left: 12,
+              right: 12,
+            }}
+          >
+            <CartesianGrid vertical={false} />
+            <XAxis
+              dataKey="time"
+              tickLine={false}
+              axisLine={false}
+              tickMargin={8}
+              minTickGap={32}
+              tickFormatter={(value) => value.slice(11, 23)}
+            />
+            <YAxis />
+            <ChartTooltip
+              content={
+                <ChartTooltipContent
+                  className="w-[150px]"
+                  nameKey="views"
+                  labelFormatter={(value) => {
+                    return new Date(value).toLocaleDateString("zh-CN", {
+                      second: "numeric",
+                      minute: "numeric",
+                      hour: "numeric",
+                      month: "short",
+                      day: "numeric",
+                      year: "numeric",
+                    });
+                  }}
+                />
+              }
+            />
+            <Line
+              dataKey="value"
+              type="monotone"
+              stroke={chartConfig.value.color}
+              strokeWidth={2}
+              dot={false}
+            />
+          </LineChart>
+        </ChartContainer>
+        <ChartContainer
+          config={chartConfig}
+          className="w-full aspect-auto h-full"
+        >
+          <LineChart
+            accessibilityLayer
+            data={handled_data}
+            margin={{
+              left: 12,
+              right: 12,
+            }}
+          >
+            <CartesianGrid vertical={false} />
+            <XAxis
+              dataKey="time"
+              tickLine={false}
+              axisLine={false}
+              tickMargin={8}
+              minTickGap={32}
+              tickFormatter={(value) => value.slice(11, 23)}
+            />
+            <YAxis />
+            <ChartTooltip
+              content={
+                <ChartTooltipContent
+                  className="w-[150px]"
+                  nameKey="views"
+                  labelFormatter={(value) => {
+                    return new Date(value).toLocaleDateString("zh-CN", {
+                      second: "numeric",
+                      minute: "numeric",
+                      hour: "numeric",
+                      month: "short",
+                      day: "numeric",
+                      year: "numeric",
+                    });
+                  }}
+                />
+              }
+            />
+            <Line
+              dataKey="value"
+              type="monotone"
+              stroke={chartConfig.cut.color}
+              strokeWidth={2}
+              dot={false}
+            />
+          </LineChart>
         </ChartContainer>
       </CardContent>
     </Card>
