@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Button } from "../ui/button";
 import { MoreHorizontal } from "lucide-react";
+import { formatTime } from "@/app/utils/util";
 
 export const TimeStampSchema = z.object({
   bridgeId: z.string(),
@@ -75,6 +76,28 @@ export const columns: ColumnDef<TimeStamp>[] = [
     enableHiding: false,
   },
   {
+    accessorKey: "id",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="ID" />
+    ),
+    cell: ({ row }) => <div className="w-[80px]">{row.getValue("id")}</div>,
+    enableSorting: false,
+    enableHiding: false,
+  },
+  {
+    accessorKey: "pointId",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Point ID" />
+    ),
+    cell: ({ row }) => {
+      return (
+        <div className="flex space-x-2">
+          <span className="w-[80px]">{row.getValue("pointId")}</span>
+        </div>
+      );
+    },
+  },
+  {
     accessorKey: "bridgeName",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Name" />
@@ -118,25 +141,17 @@ export const columns: ColumnDef<TimeStamp>[] = [
       return (
         <div className="flex space-x-2">
           {row.getValue("dataProcessedURL") ? (
-            <Badge variant="outline">NULL</Badge>
-          ) : (
             <span className="max-w-[500px] truncate font-medium">
               {row.getValue("dataProcessedURL")}
             </span>
+          ) : (
+            <Badge variant="outline">NULL</Badge>
           )}
         </div>
       );
     },
   },
-  {
-    accessorKey: "id",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="ID" />
-    ),
-    cell: ({ row }) => <div className="w-[80px]">{row.getValue("id")}</div>,
-    enableSorting: false,
-    enableHiding: false,
-  },
+
   {
     accessorKey: "log",
     header: ({ column }) => (
@@ -147,11 +162,11 @@ export const columns: ColumnDef<TimeStamp>[] = [
       return (
         <div className="flex space-x-2">
           {row.getValue("log") ? (
-            <Badge variant="outline">NULL</Badge>
-          ) : (
             <span className="max-w-[500px] truncate font-medium">
               {row.getValue("log")}
             </span>
+          ) : (
+            <Badge variant="outline">NULL</Badge>
           )}
         </div>
       );
@@ -166,7 +181,7 @@ export const columns: ColumnDef<TimeStamp>[] = [
       return (
         <div className="flex space-x-2">
           <span className="max-w-[500px] truncate font-medium">
-            {row.getValue("pass_time")}
+            {formatTime(row.getValue("pass_time"))}
           </span>
         </div>
       );
@@ -181,7 +196,7 @@ export const columns: ColumnDef<TimeStamp>[] = [
       return (
         <div className="flex space-x-2">
           <span className="max-w-[500px] truncate font-medium">
-            {row.getValue("pass_end_time")}
+            {formatTime(row.getValue("pass_end_time"))}
           </span>
         </div>
       );
@@ -200,19 +215,7 @@ export const columns: ColumnDef<TimeStamp>[] = [
       );
     },
   },
-  {
-    accessorKey: "pointId",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Point ID" />
-    ),
-    cell: ({ row }) => {
-      return (
-        <div className="flex space-x-2">
-          <span className="w-[80px]">{row.getValue("pointId")}</span>
-        </div>
-      );
-    },
-  },
+
   {
     accessorKey: "pointName",
     header: ({ column }) => (

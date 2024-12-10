@@ -3,6 +3,7 @@ import localFont from "next/font/local";
 import "./globals.css";
 import NavigationLayout from "@/components/NavigationLayout";
 import {ReduxProvider} from "@/store";
+import { Toaster } from "@/components/ui/toaster"
 // import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 // import { AppSidebar } from "@/components/MySidebar";
 
@@ -42,6 +43,7 @@ export default function RootLayout({
         </SidebarProvider> */}
             <NavigationLayout>{children}</NavigationLayout>
         </ReduxProvider>
+        <Toaster />
         </body>
         </html>
     );

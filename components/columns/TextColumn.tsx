@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Button } from "../ui/button";
 import { MoreHorizontal } from "lucide-react";
+import { formatTime } from "@/app/utils/util";
 
 export const TextSchema = z.object({
   bridgeId: z.string(),
@@ -166,11 +167,11 @@ export const columns: ColumnDef<Text>[] = [
       return (
         <div className="flex space-x-2">
           {row.getValue("dataProcessedURL") ? (
-            <Badge variant="outline">NULL</Badge>
-          ) : (
             <span className="max-w-[500px] truncate font-medium">
               {row.getValue("dataProcessedURL")}
             </span>
+          ) : (
+            <Badge variant="outline">NULL</Badge>
           )}
         </div>
       );
@@ -185,7 +186,7 @@ export const columns: ColumnDef<Text>[] = [
       return (
         <div className="flex space-x-2">
           <span className="max-w-[500px] truncate font-medium">
-            {row.getValue("pass_time")}
+            {formatTime(row.getValue("pass_time"))}
           </span>
         </div>
       );
@@ -200,7 +201,7 @@ export const columns: ColumnDef<Text>[] = [
       return (
         <div className="flex space-x-2">
           <span className="max-w-[500px] truncate font-medium">
-            {row.getValue("pass_end_time")}
+            {formatTime(row.getValue("pass_end_time"))}
           </span>
         </div>
       );

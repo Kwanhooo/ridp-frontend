@@ -257,14 +257,190 @@ export function HandledLineChart({
   );
 }
 
-export function BigLineChart({
+type ChartWithTableProps = {
+  title: string;
+  original_data: {
+    time: string;
+    value: number;
+  }[];
+  table_data:
+    | {
+        y值偏移: string;
+        偏移量: number;
+        初始段: string;
+        峰值抖动: string;
+        峰值检测: string;
+        最终段: string;
+        检测结果: boolean;
+      }
+    | undefined;
+  onModelNameChange: (value: string) => void;
+  selectOptions: string[];
+};
+
+export function ChartWithTable({
   title,
-  original_data = [
-    { time: "2024-11-01 07:44:35.000", value: -0.000507008560277789 },
-    { time: "2024-11-01 07:44:35.000", value: -0.000507008560277789 },
-  ],
-  handled_data = [],
-}: {
+  original_data = [],
+  table_data,
+  onModelNameChange,
+  selectOptions = [],
+}: ChartWithTableProps) {
+  return (
+    <Card className="h-full w-full">
+      <CardHeader className="flex flex-col items-stretch space-y-0 border-b p-0 sm:flex-row h-1/4">
+        <div className="flex flex-1 flex-col justify-center gap-1 px-12">
+          <CardTitle>{title}</CardTitle>
+        </div>
+        <div className="flex flex-1 flex-col justify-center">
+          <Select
+            onValueChange={onModelNameChange}
+            defaultValue={selectOptions[0]}
+          >
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="模型选择" />
+            </SelectTrigger>
+            <SelectContent>
+              {selectOptions.map((value) => {
+                return (
+                  <SelectItem key={value} value={value}>
+                    {value}
+                  </SelectItem>
+                );
+              })}
+            </SelectContent>
+          </Select>
+        </div>
+      </CardHeader>
+      <CardContent className="px-1 sm:p-2 h-3/4 grid grid-cols-2 gap-2">
+        <ChartContainer
+          config={chartConfig}
+          className="w-full aspect-auto h-full"
+        >
+          <LineChart
+            accessibilityLayer
+            data={original_data}
+            margin={{
+              left: 12,
+              right: 12,
+            }}
+          >
+            <CartesianGrid vertical={false} />
+            <XAxis
+              dataKey="time"
+              tickLine={false}
+              axisLine={false}
+              tickMargin={8}
+              minTickGap={32}
+              tickFormatter={(value) => value.slice(11, 23)}
+            />
+            <YAxis />
+            <ChartTooltip
+              content={
+                <ChartTooltipContent
+                  className="w-[150px]"
+                  nameKey="views"
+                  labelFormatter={(value) => {
+                    return new Date(value).toLocaleDateString("zh-CN", {
+                      second: "numeric",
+                      minute: "numeric",
+                      hour: "numeric",
+                      month: "short",
+                      day: "numeric",
+                      year: "numeric",
+                    });
+                  }}
+                />
+              }
+            />
+            <Line
+              dataKey="value"
+              type="monotone"
+              stroke={chartConfig.value.color}
+              strokeWidth={2}
+              dot={false}
+            />
+          </LineChart>
+        </ChartContainer>
+        {table_data && (
+          <div className="w-full overflow-y-auto">
+            <table className="w-full">
+              <thead>
+                <tr className="m-0 border-t p-0 even:bg-muted">
+                  <th className="border py-1 text-center font-bold [&[align=center]]:text-center [&[align=right]]:text-right">
+                    指标
+                  </th>
+                  <th className="border py-1 text-center font-bold [&[align=center]]:text-center [&[align=right]]:text-right">
+                    结果
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr className="m-0 border-t p-0 even:bg-muted">
+                  <td className="border text-center [&[align=center]]:text-center [&[align=right]]:text-right">
+                    y值偏移
+                  </td>
+                  <td className="border text-center [&[align=center]]:text-center [&[align=right]]:text-right">
+                    {table_data?.y值偏移}
+                  </td>
+                </tr>
+                <tr className="m-0 border-t p-0 even:bg-muted">
+                  <td className="border text-center [&[align=center]]:text-center [&[align=right]]:text-right">
+                    偏移量
+                  </td>
+                  <td className="border text-center sm:truncate sm:max-w-[150px] [&[align=center]]:text-center [&[align=right]]:text-right">
+                    {table_data?.偏移量}
+                  </td>
+                </tr>
+                <tr className="m-0 border-t p-0 even:bg-muted">
+                  <td className="border  text-center [&[align=center]]:text-center [&[align=right]]:text-right">
+                    初始段
+                  </td>
+                  <td className="border text-center [&[align=center]]:text-center [&[align=right]]:text-right">
+                    {table_data?.初始段}
+                  </td>
+                </tr>
+                <tr className="m-0 border-t p-0 even:bg-muted">
+                  <td className="border  text-center [&[align=center]]:text-center [&[align=right]]:text-right">
+                    峰值抖动
+                  </td>
+                  <td className="border text-center [&[align=center]]:text-center [&[align=right]]:text-right">
+                    {table_data?.峰值抖动}
+                  </td>
+                </tr>
+                <tr className="m-0 border-t p-0 even:bg-muted">
+                  <td className="border text-center [&[align=center]]:text-center [&[align=right]]:text-right">
+                    峰值检测
+                  </td>
+                  <td className="border text-center [&[align=center]]:text-center [&[align=right]]:text-right">
+                    {table_data?.峰值检测}
+                  </td>
+                </tr>
+                <tr className="m-0 border-t p-0 even:bg-muted">
+                  <td className="border text-center [&[align=center]]:text-center [&[align=right]]:text-right">
+                    最终段
+                  </td>
+                  <td className="border text-center [&[align=center]]:text-center [&[align=right]]:text-right">
+                    {table_data?.最终段}
+                  </td>
+                </tr>
+                {/* <tr className="m-0 border-t p-0 even:bg-muted">
+                <td className="border  text-center [&[align=center]]:text-center [&[align=right]]:text-right">
+                  检测结果
+                </td>
+                <td className="border text-center [&[align=center]]:text-center [&[align=right]]:text-right">
+                  {table_data?.检测结果}
+                </td>
+              </tr> */}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
+type BigLineChartProps = {
   title: string;
   original_data: {
     time: string;
@@ -274,27 +450,69 @@ export function BigLineChart({
     time: string;
     value: number;
   }[];
-}) {
-  console.log(original_data);
-  console.log(handled_data);
+  onModelNameChange: (value: string) => void;
+  onModelTypeChange?: (value: string) => void;
+  selectOptions: string[];
+  anomalyOptions?: string[];
+};
 
+export function BigLineChart({
+  title,
+  original_data = [],
+  handled_data = [],
+  onModelNameChange,
+  onModelTypeChange,
+  selectOptions = [],
+  anomalyOptions,
+}: BigLineChartProps) {
   return (
     <Card className="h-full w-full">
       <CardHeader className="flex flex-col items-stretch space-y-0 border-b p-0 sm:flex-row h-1/4">
         <div className="flex flex-1 flex-col justify-center gap-1 px-12">
           <CardTitle>{title}</CardTitle>
         </div>
-        <div className="flex flex-1 flex-col justify-center">
-          <Select>
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="模型选择" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="light">模型1</SelectItem>
-              <SelectItem value="dark">模型2</SelectItem>
-              <SelectItem value="system">模型3</SelectItem>
-            </SelectContent>
-          </Select>
+        <div className="flex flex-1 flex-row justify-center gap-x-2">
+          <div className="flex flex-1 flex-col justify-center">
+            <Select
+              onValueChange={onModelNameChange}
+              defaultValue={selectOptions[0]}
+            >
+              <SelectTrigger className="w-[150px]">
+                <SelectValue placeholder="模型选择" />
+              </SelectTrigger>
+              <SelectContent>
+                {selectOptions.map((value) => {
+                  return (
+                    <SelectItem key={value} value={value}>
+                      {value}
+                    </SelectItem>
+                  );
+                })}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="flex flex-1 flex-col justify-center">
+            {anomalyOptions && (
+              <Select
+                onValueChange={onModelTypeChange}
+                defaultValue={anomalyOptions[0]}
+              >
+                <SelectTrigger className="w-[150px]">
+                  <SelectValue placeholder="指标选择" />
+                </SelectTrigger>
+                <SelectContent>
+                  {anomalyOptions.map((value) => {
+                    return (
+                      <SelectItem key={value} value={value}>
+                        {value}
+                      </SelectItem>
+                    );
+                  })}
+                </SelectContent>
+              </Select>
+            )}
+          </div>
         </div>
       </CardHeader>
       <CardContent className="px-1 sm:p-2 h-3/4 grid grid-cols-2 gap-2">
