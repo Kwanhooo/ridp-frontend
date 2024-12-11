@@ -476,6 +476,7 @@ const Page = () => {
             onModelTypeChange={setAnomalyDetectionType}
             selectOptions={modelNameOptions}
             anomalyOptions={["四分位间距", "均值和标准差", "Z分数"]}
+            detection_index={anomalyDetection?.anomaly_indices}
           ></BigLineChart>
           <BigLineChart
             original_data={originChartData}

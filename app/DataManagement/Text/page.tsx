@@ -31,6 +31,13 @@ const Page = () => {
   const [selectedPointName, setSelectedPointName] = useState<string>("");
   const [pointNameOptions, setPointNameOptions] = useState<string[]>([]);
 
+  const [selectedTextModeType, setSelectedTextModeType] =
+    useState<string>("数据清洗反馈");
+  const [textModeTypeOptions] = useState<string[]>([
+    "数据清洗反馈",
+    "日志记录",
+  ]);
+
   const [data, setData] = useState<Text[]>([]);
 
   const [page, setPage] = useState<number>(1);
@@ -101,6 +108,7 @@ const Page = () => {
         const text = await get<Text[]>("text_manage", {
           page: page,
           pageSize: pageSize,
+          textModeType: selectedTextModeType,
           bridgeName: selectedBridge,
           passTime: selectedPassTime,
           passEndTime: selectedPassEndTime,
@@ -127,6 +135,7 @@ const Page = () => {
     setSelectedPassTime("");
     setSelectedPassEndTime("");
     setSelectedPointName("");
+    setSelectedTextModeType("");
     // setData([]);
   };
 
@@ -136,7 +145,8 @@ const Page = () => {
         selectedBridge,
         selectedPassTime,
         selectedPointName,
-        selectedPassEndTime
+        selectedPassEndTime,
+        selectedTextModeType
       )
     ) {
       try {
@@ -144,6 +154,7 @@ const Page = () => {
         const text = await get<Text[]>("text_manage", {
           page: page,
           pageSize: pageSize,
+          textModeType: selectedTextModeType,
           bridgeName: "",
           passTime: "",
           passEndTime: "",
@@ -151,6 +162,8 @@ const Page = () => {
         });
 
         setData(z.array(TextSchema).parse(text));
+        console.log(text);
+        
       } catch (error) {
         console.error("Error fetching data:", error);
       } finally {
@@ -200,6 +213,23 @@ const Page = () => {
             </SelectTrigger>
             <SelectContent>
               {pointNameOptions.map((option) => (
+                <SelectItem key={option} value={option}>
+                  {option}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
+          <Select
+            value={selectedTextModeType}
+            onValueChange={(value) => setSelectedTextModeType(value)}
+            disabled={loading}
+          >
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="选择指标" />
+            </SelectTrigger>
+            <SelectContent>
+              {textModeTypeOptions.map((option) => (
                 <SelectItem key={option} value={option}>
                   {option}
                 </SelectItem>

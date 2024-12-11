@@ -24,6 +24,7 @@ import {
 } from "@/components/ui/select";
 
 import { useEffect, useState } from "react";
+import { GitCommitVertical } from "lucide-react";
 
 type OriginalChartData = {
   title: string;
@@ -454,6 +455,7 @@ type BigLineChartProps = {
   onModelTypeChange?: (value: string) => void;
   selectOptions: string[];
   anomalyOptions?: string[];
+  detection_index?: number[];
 };
 
 export function BigLineChart({
@@ -464,7 +466,9 @@ export function BigLineChart({
   onModelTypeChange,
   selectOptions = [],
   anomalyOptions,
+  detection_index,
 }: BigLineChartProps) {
+  
   return (
     <Card className="h-full w-full">
       <CardHeader className="flex flex-col items-stretch space-y-0 border-b p-0 sm:flex-row h-1/4">
@@ -610,7 +614,24 @@ export function BigLineChart({
               type="monotone"
               stroke={chartConfig.cut.color}
               strokeWidth={2}
-              dot={false}
+              dot={({ cx, cy, payload, index }) => {
+                if (detection_index && index in detection_index) {
+                  const r = 24;
+                  return (
+                    <GitCommitVertical
+                      key={payload.month}
+                      x={cx - r / 2}
+                      y={cy - r / 2}
+                      width={r}
+                      height={r}
+                      fill={chartConfig.value.color}
+                      stroke={chartConfig.value.color}
+                    />
+                  );
+                } else {
+                  return <></>;
+                }
+              }}
             />
           </LineChart>
         </ChartContainer>

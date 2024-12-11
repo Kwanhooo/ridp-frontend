@@ -119,13 +119,12 @@ export const DateTimePicker = ({
           defaultMonth={minDate}
           disabled={{ before: minDate, after: maxDate }}
         />
-        <div className="border-t border-border p-3">
-          {/* <TimePicker onChange={handleTimeChange} date={time} timeList={time_list}/> */}
+        <div className="border-t border-border p-3 ">
           <Select onValueChange={handleTimeChange}>
             <SelectTrigger className="w-full">
               <SelectValue placeholder="请在上方选择日期" />
             </SelectTrigger>
-            <SelectContent className="h-96">
+            <SelectContent className="overflow-y-auto">
               {filteredTimeList.map((time) => (
                 <SelectItem key={time.toString()} value={time.toString()}>
                   {format(time, "HH:mm:ss")}
