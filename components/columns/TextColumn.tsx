@@ -70,7 +70,6 @@ export const columns: ColumnDef<Text>[] = [
       <DataTableColumnHeader column={column} title="Bridge Name" />
     ),
     cell: ({ row }) => {
-      console.log(row.getValue("bridgeName"));
       return (
         <div className="max-w-[500px] truncate font-medium">
           {row.getValue("bridgeName")}

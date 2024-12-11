@@ -161,7 +161,7 @@ const Page = () => {
           page: page,
           pageSize: pageSize,
           bridgeName: "",
-          featureModelType: "",
+          featureModelType: selectedFeatureModelType,
           pointName: "",
           passTime: "",
           passEndTime: "",

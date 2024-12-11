@@ -143,7 +143,7 @@ const Page = () => {
           page: page,
           pageSize: pageSize,
           bridgeName: "",
-          multiMediaMode: "",
+          multiMediaMode: selectedMultiMediaMode,
           passTime: "",
           passEndTime: "",
         });

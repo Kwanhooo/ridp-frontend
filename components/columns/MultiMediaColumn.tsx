@@ -2,7 +2,7 @@ import { ColumnDef } from "@tanstack/react-table";
 
 import { Checkbox } from "@/components/ui/checkbox";
 
-import { DataTableColumnHeader } from "../TableHeader";
+import { DataTableColumnHeader } from "@/components/TableHeader";
 
 import { z } from "zod";
 import Image from "next/image";
@@ -16,16 +16,17 @@ import {
   DropdownMenuSeparator,
   DropdownMenuShortcut,
 } from "@/components/ui/dropdown-menu";
-import { Button } from "../ui/button";
+import { Button } from "@/components/ui/button";
 import { MoreHorizontal } from "lucide-react";
-import { Badge } from "../ui/badge";
-import { AspectRatio } from "../ui/aspect-ratio";
+import { Badge } from "@/components/ui/badge";
+import { AspectRatio } from "@/components/ui/aspect-ratio";
+import { formatTime } from "@/app/utils/util";
 
 export const MultiMediaSchema = z.object({
   bridge_name: z.string(),
   pass_end_time: z.string(),
   pass_time: z.string(),
-  post_pic_url: z.string().nullish(),
+  post_pic_url: z.string().nullable(),
 });
 
 export type MultiMedia = z.infer<typeof MultiMediaSchema>;
@@ -76,7 +77,7 @@ export const columns: ColumnDef<MultiMedia>[] = [
       return (
         <div className="flex space-x-2">
           <span className="max-w-[500px] truncate font-medium">
-            {row.getValue("pass_time")}
+            {formatTime(row.getValue("pass_time"))}
           </span>
         </div>
       );
@@ -91,7 +92,7 @@ export const columns: ColumnDef<MultiMedia>[] = [
       return (
         <div className="flex space-x-2">
           <span className="max-w-[500px] truncate font-medium">
-            {row.getValue("pass_end_time")}
+            {formatTime(row.getValue("pass_end_time"))}
           </span>
         </div>
       );

@@ -204,10 +204,6 @@ const Page = () => {
         setAnomalyDetection(anomalyDetectionResponse.result);
         setAnomalyFilling(anomalyFillingResponse.result!);
         setMissingFilling(missingFillingResponse.result!);
-
-        console.log(anomalyDetection);
-        console.log(anomalyFilling);
-        console.log(missingFilling);
       } catch (error) {
         console.error("Error fetching data:", error);
       } finally {
@@ -261,14 +257,15 @@ const Page = () => {
       if (checkParameters(selectedBridge, selectedTime, selectedMetric)) {
         try {
           setLoading(true);
-          const cutResult = await get<ChartData[]>("data_process/cut", {
+          const cutResult = await get<ResponseData>("data_process/cut", {
             bridge: selectedBridge,
             time: selectedTime,
             pointName: selectedMetric,
             modelName: cutModelType,
           });
 
-          setCutChartData(cutResult);
+          setCutChartData(cutResult.data);
+          
         } catch {
           console.log("error");
         } finally {
@@ -285,14 +282,14 @@ const Page = () => {
       if (checkParameters(selectedBridge, selectedTime, selectedMetric)) {
         try {
           setLoading(true);
-          const filterResult = await get<ChartData[]>("data_process/filter", {
+          const filterResult = await get<ResponseData>("data_process/filter", {
             bridge: selectedBridge,
             time: selectedTime,
             pointName: selectedMetric,
             modelName: filterModelType,
           });
 
-          setFilterChartData(filterResult);
+          setFilterChartData(filterResult.data);
         } catch {
           console.log("error");
         } finally {
@@ -336,7 +333,7 @@ const Page = () => {
       if (checkParameters(selectedBridge, selectedTime, selectedMetric)) {
         try {
           setLoading(true);
-          const fillingResult = await get<ChartData[]>(
+          const fillingResult = await get<ResponseData>(
             "data_process/anomaly_filling",
             {
               bridge: selectedBridge,
@@ -346,7 +343,7 @@ const Page = () => {
               modelType: anomalyFillingType,
             }
           );
-          setAnomalyFilling(fillingResult);
+          setAnomalyFilling(fillingResult.data);
         } catch {
           console.log("error");
         } finally {
@@ -363,7 +360,7 @@ const Page = () => {
       if (checkParameters(selectedBridge, selectedTime, selectedMetric)) {
         try {
           setLoading(true);
-          const fillingResult = await get<ChartData[]>(
+          const fillingResult = await get<ResponseData>(
             "data_process/missing_filling",
             {
               bridge: selectedBridge,
@@ -374,7 +371,7 @@ const Page = () => {
             }
           );
 
-          setMissingFilling(fillingResult);
+          setMissingFilling(fillingResult.data);
         } catch {
           console.log("error");
         } finally {
