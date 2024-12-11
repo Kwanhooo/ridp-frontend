@@ -153,6 +153,9 @@ const Page = () => {
   const handlePageChange = (newPage: number, newPageSize: number) => {
     setPage(newPage);
     setPageSize(newPageSize);
+
+    console.log(newPage, newPageSize);
+    
   };
 
   return (

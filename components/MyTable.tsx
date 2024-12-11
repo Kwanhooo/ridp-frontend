@@ -54,6 +54,7 @@ export function MyTable<TData, TValue>({
       columnFilters,
     },
     enableRowSelection: true,
+    // manualPagination: true,
     onRowSelectionChange: setRowSelection,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
@@ -118,7 +119,7 @@ export function MyTable<TData, TValue>({
           </TableBody>
         </Table>
       </div>
-      <Pagination table={table} onPageChange={onPageChange} />
+      <Pagination table={table} onPageChange={onPageChange}/>
     </div>
   )
 }

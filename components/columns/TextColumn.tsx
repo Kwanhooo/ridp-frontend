@@ -78,7 +78,7 @@ export const columns: ColumnDef<Text>[] = [
     },
   },
   {
-    accessorKey: "clean_result",
+    accessorKey: "clean_result.y值偏移",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="y值偏移" />
     ),
@@ -98,7 +98,7 @@ export const columns: ColumnDef<Text>[] = [
     },
   },
   {
-    accessorKey: "clean_result",
+    accessorKey: "clean_result.偏移量",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="偏移量" />
     ),
@@ -117,7 +117,7 @@ export const columns: ColumnDef<Text>[] = [
     },
   },
   {
-    accessorKey: "clean_result",
+    accessorKey: "clean_result.初始段",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="初始段" />
     ),
@@ -136,7 +136,7 @@ export const columns: ColumnDef<Text>[] = [
     },
   },
   {
-    accessorKey: "clean_result",
+    accessorKey: "clean_result.峰值抖动",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="峰值抖动" />
     ),
@@ -155,7 +155,7 @@ export const columns: ColumnDef<Text>[] = [
     },
   },
   {
-    accessorKey: "clean_result",
+    accessorKey: "clean_result.峰值检测",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="峰值检测" />
     ),
@@ -175,7 +175,7 @@ export const columns: ColumnDef<Text>[] = [
   },
   // 最终段
   {
-    accessorKey: "clean_result",
+    accessorKey: "clean_result.最终段",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="最终段" />
     ),

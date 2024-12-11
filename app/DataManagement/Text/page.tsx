@@ -162,7 +162,6 @@ const Page = () => {
         });
 
         setData(z.array(TextSchema).parse(text));
-        console.log(text);
         
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -175,6 +174,8 @@ const Page = () => {
   const handlePageChange = (newPage: number, newPageSize: number) => {
     setPage(newPage);
     setPageSize(newPageSize);
+
+    
   };
 
   return (
