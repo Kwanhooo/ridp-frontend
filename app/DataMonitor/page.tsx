@@ -24,6 +24,7 @@ import DemoLineChart from "@/components/DemoLineChart";
 import {setSidebarState} from "@/store/modules/sidebarSlice";
 import {useDispatch} from "react-redux";
 import {AppDispatch} from "@/store";
+import {ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight} from "lucide-react";
 
 /**
  * 一些类型定义
@@ -52,6 +53,10 @@ type DataColumn = {
     weight: number; // 数字类型
     zip_pic_url: string; // 字符串类型，zip 文件 URL
 };
+type TrainPassingResponse = {
+    count: number;
+    data: DataColumn[];
+}
 type TypeListResponse = string[];
 type BridgeListResponse = string[];
 
@@ -91,20 +96,22 @@ const DataMonitor = () => {
     const [data, setData] = React.useState<DataColumn[]>([]);
     const [page, setPage] = React.useState(1);
     const [pageSize] = React.useState(6);
-    // const [total, setTotal] = React.useState(0);
+    const [total, setTotal] = React.useState(0);
     const [refreshSignal, setRefreshSignal] = React.useState<boolean>(false); // 控制子组件刷新
+    const [clearSignal, setClearhSignal] = React.useState<boolean>(false); // 控制子组件清空
 
     // 加载分页表格数据
     const fetchTableData = async () => {
         try {
-            const tableData = await fetchData<DataColumn[]>('/train_passing', {
+            const tableData = await fetchData<TrainPassingResponse>('/train_passing', {
                 bridge: selectedBridge,
-                pass_time: selectedStartTime,
-                pass_end_time: selectedEndTime,
+                pass_time: selectedStartTime.replace('T', ' '),
+                pass_end_time: selectedEndTime.replace('T', ' '),
                 page,
                 pageSize,
             });
-            setData(tableData);
+            setTotal(tableData.count);
+            setData(tableData.data);
         } catch (error) {
             console.error("加载表格数据失败", error);
         }
@@ -120,6 +127,11 @@ const DataMonitor = () => {
         setPage(page + 1);
     };
 
+    // 跳转到指定页
+    const handlePageChange = (pageIndex: number) => {
+        setPage(pageIndex);
+    };
+
     // 格式化时间
     const formatTime = (time: string) => {
         // Fri, 01 Nov 2024 07:44:35 GMT to 2024-11-01 13:25:16
@@ -131,11 +143,12 @@ const DataMonitor = () => {
         const minute = date.getUTCMinutes().toString().padStart(2, '0');
         const second = date.getUTCSeconds().toString().padStart(2, '0');
 
-        return `${year}-${month}-${day} ${hour}:${minute}:${second}`;
+        return year + '-' + month + '-' + day + ' ' + hour + ':' + minute + ':' + second;
     }
 
     // 选择桥梁时更新数据
     const handleDetailClicked = async (row: Row<DataColumn>) => {
+        setClearhSignal(!clearSignal);
         const rowData = row.original;
         setSelectedDetailRow(rowData);
         setSelectedBridge(rowData.bridge_name);
@@ -390,27 +403,55 @@ const DataMonitor = () => {
                             </Table>
                         </div>
                         <div className="flex items-center justify-end space-x-2 py-4">
+                            {/* 已选择和总行数显示 */}
                             <div className="flex-1 text-sm text-muted-foreground">
-                                已选择{table.getFilteredSelectedRowModel().rows.length}行
-                                共{table.getFilteredRowModel().rows.length}行
+                                已选择 {table.getFilteredSelectedRowModel().rows.length} 行
+                                共 {table.getFilteredRowModel().rows.length} 行
                             </div>
-                            <div className="space-x-2">
-                                <Button
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={() => previousPage()}
-                                    // disabled={!table.getCanPreviousPage()}
-                                >
-                                    上一页
-                                </Button>
-                                <Button
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={() => nextPage()}
-                                    // disabled={!table.getCanNextPage()}
-                                >
-                                    下一页
-                                </Button>
+
+                            {/* 页码选择器和翻页按钮 */}
+                            <div className="flex flex-row space-x-6">
+                                {/* 页码显示 */}
+                                <div className="flex items-center text-sm font-medium">
+                                    第 {table.getState().pagination.pageIndex + 1} 页&nbsp;&nbsp;&nbsp;&nbsp;共{" "}
+                                    {Math.ceil(total / pageSize)} 页
+                                </div>
+
+                                {/* 页码选择器 */}
+                                <div className="flex items-center space-x-2">
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={() => handlePageChange(0)}
+                                        disabled={!table.getCanPreviousPage()}
+                                    >
+                                        <ChevronsLeft/>
+                                    </Button>
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={() => previousPage()}
+                                        disabled={!table.getCanPreviousPage()}
+                                    >
+                                        <ChevronLeft/>
+                                    </Button>
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={() => nextPage()}
+                                        disabled={!table.getCanNextPage()}
+                                    >
+                                        <ChevronRight/>
+                                    </Button>
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={() => handlePageChange(table.getPageCount() - 1)}
+                                        disabled={!table.getCanNextPage()}
+                                    >
+                                        <ChevronsRight/>
+                                    </Button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -437,7 +478,7 @@ const DataMonitor = () => {
                                         bridge={selectedBridge}
                                         time={selectedDetailRow ? formatTime(selectedDetailRow.pass_time) : ''}
                                         type={type}
-                                        clear={selectedBridge === ''}
+                                        clear={clearSignal}
                                         refreshSignal={refreshSignal}  // 将信号传递给子组件
                                     />
                                 </div>
