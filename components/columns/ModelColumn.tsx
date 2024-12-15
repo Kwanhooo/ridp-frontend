@@ -60,6 +60,17 @@ export const columns: ColumnDef<Model>[] = [
     enableHiding: false,
   },
   {
+    accessorKey: "modelId",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Model ID" />
+    ),
+    cell: ({ row }) => {
+      return <div className="w-[50px]">{row.getValue("modelId")}</div>;
+    },
+    enableSorting: false,
+    enableHiding: false,
+  },
+  {
     accessorKey: "extension",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Extension" />
@@ -69,15 +80,6 @@ export const columns: ColumnDef<Model>[] = [
     ),
     enableSorting: false,
     enableHiding: false,
-  },
-  {
-    accessorKey: "modelId",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Model ID" />
-    ),
-    cell: ({ row }) => {
-      return <div className="w-[50px]">{row.getValue("extension")}</div>;
-    },
   },
   {
     accessorKey: "modelName",
@@ -117,8 +119,6 @@ export const columns: ColumnDef<Model>[] = [
     cell: ({ row }) => (
       <div className="w-[80px]">{row.getValue("pointId")}</div>
     ),
-    enableSorting: false,
-    enableHiding: false,
   },
   {
     accessorKey: "pointName",

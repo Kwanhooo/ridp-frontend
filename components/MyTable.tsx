@@ -1,4 +1,4 @@
-import * as React from "react"
+import * as React from "react";
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -12,7 +12,7 @@ import {
   getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
-} from "@tanstack/react-table"
+} from "@tanstack/react-table";
 
 import {
   Table,
@@ -21,28 +21,30 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table"
+} from "@/components/ui/table";
 
-import { Pagination } from "./Pagination"
+import { Pagination } from "./Pagination";
 
 interface DataTableProps<TData, TValue> {
-  columns: ColumnDef<TData, TValue>[]
-  data: TData[]
-  onPageChange: (pageIndex: number, pageSize: number) => void
+  columns: ColumnDef<TData, TValue>[];
+  data: TData[];
+  onPageChange: (pageIndex: number, pageSize: number) => void;
+  totalPages: number;
 }
 
 export function MyTable<TData, TValue>({
   columns,
   data,
   onPageChange,
+  totalPages,
 }: DataTableProps<TData, TValue>) {
-  const [rowSelection, setRowSelection] = React.useState({})
+  const [rowSelection, setRowSelection] = React.useState({});
   const [columnVisibility, setColumnVisibility] =
-    React.useState<VisibilityState>({})
+    React.useState<VisibilityState>({});
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
-  )
-  const [sorting, setSorting] = React.useState<SortingState>([])
+  );
+  const [sorting, setSorting] = React.useState<SortingState>([]);
 
   const table = useReactTable({
     data,
@@ -54,6 +56,8 @@ export function MyTable<TData, TValue>({
       columnFilters,
     },
     enableRowSelection: true,
+    manualPagination: true,
+    pageCount: totalPages,
     onRowSelectionChange: setRowSelection,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
@@ -64,7 +68,7 @@ export function MyTable<TData, TValue>({
     getSortedRowModel: getSortedRowModel(),
     getFacetedRowModel: getFacetedRowModel(),
     getFacetedUniqueValues: getFacetedUniqueValues(),
-  })
+  });
 
   return (
     <div className="space-y-4">
@@ -83,7 +87,7 @@ export function MyTable<TData, TValue>({
                             header.getContext()
                           )}
                     </TableHead>
-                  )
+                  );
                 })}
               </TableRow>
             ))}
@@ -120,5 +124,5 @@ export function MyTable<TData, TValue>({
       </div>
       <Pagination table={table} onPageChange={onPageChange} />
     </div>
-  )
+  );
 }
