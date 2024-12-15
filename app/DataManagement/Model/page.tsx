@@ -40,6 +40,7 @@ const Page = () => {
 
   const [page, setPage] = useState<number>(1);
   const [pageSize, setPageSize] = useState<number>(10);
+  const [totalPages, setTotalPages] = useState<number>(1);
 
   // Fetch bridge name first
   useEffect(() => {
@@ -47,7 +48,7 @@ const Page = () => {
       try {
         setLoading(true);
         const bridge_options = await get<string[]>("bridges");
-        setSelectedBridge(bridge_options[0]);
+        // setSelectedBridge(bridge_options[0]);
         setBridgeOptions(bridge_options);
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -67,7 +68,7 @@ const Page = () => {
           const point_name_options = await get<string[]>("pointName", {
             bridge: selectedBridge,
           });
-          setSelectedPointName(point_name_options[0]);
+          // setSelectedPointName(point_name_options[0]);
           setPointNameOptions(point_name_options);
         } catch (error) {
           console.error("Error fetching time options:", error);
@@ -79,9 +80,28 @@ const Page = () => {
     fetch_point_name_options();
   }, [selectedBridge]);
 
-  const handlePageChange = (newPage: number, newPageSize: number) => {
+  const handlePageChange = async (newPage: number, newPageSize: number) => {
     setPage(newPage);
     setPageSize(newPageSize);
+    try {
+      setLoading(true);
+      const model_data = await get<{ count: number; data: Model[] }>(
+        "model_manage",
+        {
+          page: newPage,
+          pageSize: newPageSize,
+          modelType: selectedModelType,
+          modelName: selectedModelName,
+          pointName: selectedPointName,
+        }
+      );
+
+      setData(z.array(ModelSchema).parse(model_data.data));
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleQuery = async () => {
@@ -95,15 +115,19 @@ const Page = () => {
     ) {
       try {
         setLoading(true);
-        const model_data = await get<Model[]>("model_manage", {
-          page: page,
-          pageSize: pageSize,
-          modelType: selectedModelType,
-          modelName: selectedModelName,
-          pointName: selectedPointName,
-        });
+        const model_data = await get<{ count: number; data: Model[] }>(
+          "model_manage",
+          {
+            page: page,
+            pageSize: pageSize,
+            modelType: selectedModelType,
+            modelName: selectedModelName,
+            pointName: selectedPointName,
+          }
+        );
 
-        setData(z.array(ModelSchema).parse(model_data));
+        setData(z.array(ModelSchema).parse(model_data.data));
+        setTotalPages(Math.ceil(model_data.count / pageSize));
       } catch (error) {
         console.error("Error fetching data:", error);
       } finally {
@@ -127,30 +151,25 @@ const Page = () => {
   };
 
   const getAllData = async () => {
-    if (
-      checkParameters(
-        selectedBridge,
-        selectedModelType,
-        selectedModelName,
-        selectedPointName
-      )
-    ) {
-      try {
-        setLoading(true);
-        const model_data = await get<Model[]>("model_manage", {
+    try {
+      setLoading(true);
+      const model_data = await get<{ count: number; data: Model[] }>(
+        "model_manage",
+        {
           page: page,
           pageSize: pageSize,
           modelType: "",
           modelName: "",
           pointName: "",
-        });
+        }
+      );
 
-        setData(z.array(ModelSchema).parse(model_data));
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      } finally {
-        setLoading(false);
-      }
+      setData(z.array(ModelSchema).parse(model_data.data));
+      setTotalPages(Math.ceil(model_data.count / pageSize));
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -247,6 +266,7 @@ const Page = () => {
           data={data}
           columns={columns}
           onPageChange={handlePageChange}
+          totalPages={totalPages}
         />
       </div>
     </div>

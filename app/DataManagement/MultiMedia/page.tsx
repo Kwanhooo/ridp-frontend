@@ -26,9 +26,9 @@ const Page = () => {
   const [selectedBridge, setSelectedBridge] = useState<string>("");
   const [bridgeOptions, setBridgeOptions] = useState<string[]>([]);
 
-  const [selectedMultiMediaMode, setSelectedMultiMediaMode] =
+  const [selectedMultimediaModeType, setSelectedMultimediaModeType] =
     useState<string>("图片数据");
-  const [multiMediaModeOptions] = useState<string[]>(["图片数据", "视频数据"]);
+  const [multimediaModeTypeOptions] = useState<string[]>(["图片数据", "视频数据"]);
 
   const [selectedPassTime, setSelectedPassTime] = useState<string>("");
   const [passTimeOptions, setPassTimeOptions] = useState<string[]>([]);
@@ -40,6 +40,7 @@ const Page = () => {
 
   const [page, setPage] = useState<number>(1);
   const [pageSize, setPageSize] = useState<number>(10);
+  const [totalPages, setTotalPages] = useState<number>(1);
 
   // Fetch bridge name first
   useEffect(() => {
@@ -47,7 +48,7 @@ const Page = () => {
       try {
         setLoading(true);
         const bridge_options = await get<string[]>("bridges");
-        setSelectedBridge(bridge_options[0]);
+        // setSelectedBridge(bridge_options[0]);
         setBridgeOptions(bridge_options);
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -66,14 +67,14 @@ const Page = () => {
           const pass_time_option = await get<string[]>("times", {
             bridge: selectedBridge,
           });
-          setSelectedPassTime(pass_time_option[0]);
+          // setSelectedPassTime(pass_time_option[0]);
           setPassTimeOptions(pass_time_option);
 
-          setSelectedPassEndTime(
-            pass_time_option.length > 1
-              ? pass_time_option[1]
-              : pass_time_option[0]
-          );
+          // setSelectedPassEndTime(
+          //   pass_time_option.length > 1
+          //     ? pass_time_option[1]
+          //     : pass_time_option[0]
+          // );
           setPassEndTimeOptions(pass_time_option);
         } catch (error) {
           console.error("Error fetching time options:", error);
@@ -89,23 +90,27 @@ const Page = () => {
     if (
       checkParameters(
         selectedBridge,
-        selectedMultiMediaMode,
+        selectedMultimediaModeType,
         selectedPassTime,
         selectedPassEndTime
       )
     ) {
       try {
         setLoading(true);
-        const multi_media = await get<MultiMedia[]>("multimedia_manage", {
-          page: page,
-          pageSize: pageSize,
-          bridgeName: selectedBridge,
-          multiMediaMode: selectedMultiMediaMode,
-          passTime: selectedPassTime,
-          passEndTime: selectedPassEndTime,
-        });
+        const multi_media = await get<{ count: number; data: MultiMedia[] }>(
+          "multimedia_manage",
+          {
+            page: page,
+            pageSize: pageSize,
+            bridgeName: selectedBridge,
+            multimediaModeType: selectedMultimediaModeType,
+            passTime: selectedPassTime,
+            passEndTime: selectedPassEndTime,
+          }
+        );
 
-        setData(z.array(MultiMediaSchema).parse(multi_media));
+        setData(z.array(MultiMediaSchema).parse(multi_media.data));
+        setTotalPages(Math.ceil(multi_media.count / pageSize));
       } catch (error) {
         console.error("Error fetching data:", error);
       } finally {
@@ -122,33 +127,30 @@ const Page = () => {
 
   const handleReset = async () => {
     setSelectedBridge("");
-    setSelectedMultiMediaMode("");
+    setSelectedMultimediaModeType("");
     setSelectedPassTime("");
     setSelectedPassEndTime("");
     // setData([]);
   };
 
   const getAllData = async () => {
-    if (
-      checkParameters(
-        selectedBridge,
-        selectedMultiMediaMode,
-        selectedPassTime,
-        selectedPassEndTime
-      )
-    ) {
+    if (checkParameters(selectedMultimediaModeType)) {
       try {
         setLoading(true);
-        const multi_media = await get<MultiMedia[]>("multimedia_manage", {
-          page: page,
-          pageSize: pageSize,
-          bridgeName: "",
-          multiMediaMode: selectedMultiMediaMode,
-          passTime: "",
-          passEndTime: "",
-        });
+        const multi_media = await get<{ count: number; data: MultiMedia[] }>(
+          "multimedia_manage",
+          {
+            page: page,
+            pageSize: pageSize,
+            bridgeName: "",
+            multimediaModeType: selectedMultimediaModeType,
+            passTime: "",
+            passEndTime: "",
+          }
+        );
 
-        setData(z.array(MultiMediaSchema).parse(multi_media));
+        setData(z.array(MultiMediaSchema).parse(multi_media.data));
+        setTotalPages(Math.ceil(multi_media.count / pageSize));
       } catch (error) {
         console.error("Error fetching data:", error);
       } finally {
@@ -157,10 +159,31 @@ const Page = () => {
     }
   };
 
-  const handlePageChange = (newPage: number, newPageSize: number) => {
+  const handlePageChange = async (newPage: number, newPageSize: number) => {
     setPage(newPage);
     setPageSize(newPageSize);
-    console.log(`Page: ${newPage}, PageSize: ${newPageSize}`);
+    if (checkParameters(selectedMultimediaModeType)) {
+      try {
+        setLoading(true);
+        const multi_media = await get<{ count: number; data: MultiMedia[] }>(
+          "multimedia_manage",
+          {
+            page: newPage,
+            pageSize: newPageSize,
+            bridgeName: selectedBridge,
+            multimediaModeType: selectedMultimediaModeType,
+            passTime: selectedPassTime,
+            passEndTime: selectedPassEndTime,
+          }
+        );
+
+        setData(z.array(MultiMediaSchema).parse(multi_media.data));
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
   };
 
   return (
@@ -190,15 +213,15 @@ const Page = () => {
           </Select>
 
           <Select
-            value={selectedMultiMediaMode}
-            onValueChange={(value) => setSelectedMultiMediaMode(value)}
+            value={selectedMultimediaModeType}
+            onValueChange={(value) => setSelectedMultimediaModeType(value)}
             disabled={loading}
           >
             <SelectTrigger className="w-[180px]">
               <SelectValue placeholder="选择指标" />
             </SelectTrigger>
             <SelectContent>
-              {multiMediaModeOptions.map((option) => (
+              {multimediaModeTypeOptions.map((option) => (
                 <SelectItem key={option} value={option}>
                   {option}
                 </SelectItem>
@@ -232,6 +255,7 @@ const Page = () => {
           data={data}
           columns={columns}
           onPageChange={handlePageChange}
+          totalPages={totalPages}
         />
       </div>
     </div>

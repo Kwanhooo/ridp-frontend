@@ -26,7 +26,7 @@ export function Pagination<TData>({
 }: DataTablePaginationProps<TData>) {
   const handlePageChange = (pageIndex: number) => {
     table.setPageIndex(pageIndex);
-    onPageChange(pageIndex, table.getState().pagination.pageSize);
+    onPageChange(pageIndex + 1, table.getState().pagination.pageSize);
   };
 
   return (
@@ -58,7 +58,7 @@ export function Pagination<TData>({
             </SelectContent>
           </Select>
         </div>
-        <div className="flex w-[100px] items-center justify-center text-sm font-medium">
+        <div className="flex w-[150px] items-center justify-center text-sm font-medium">
           Page {table.getState().pagination.pageIndex + 1} of{" "}
           {table.getPageCount()}
         </div>
@@ -75,7 +75,9 @@ export function Pagination<TData>({
           <Button
             variant="outline"
             className="h-8 w-8 p-0"
-            onClick={() => handlePageChange(table.getState().pagination.pageIndex - 1)}
+            onClick={() =>
+              handlePageChange(table.getState().pagination.pageIndex - 1)
+            }
             disabled={!table.getCanPreviousPage()}
           >
             <span className="sr-only">Go to previous page</span>
@@ -84,7 +86,9 @@ export function Pagination<TData>({
           <Button
             variant="outline"
             className="h-8 w-8 p-0"
-            onClick={() => handlePageChange(table.getState().pagination.pageIndex + 1)}
+            onClick={() =>
+              handlePageChange(table.getState().pagination.pageIndex + 1)
+            }
             disabled={!table.getCanNextPage()}
           >
             <span className="sr-only">Go to next page</span>

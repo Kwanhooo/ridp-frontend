@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Button } from "../ui/button";
 import { MoreHorizontal } from "lucide-react";
+import { formatTime } from "@/app/utils/util";
 
 export const FeatureSchema = z.object({
   bridge_name: z.string(),
@@ -77,21 +78,6 @@ export const columns: ColumnDef<Feature>[] = [
     },
   },
   {
-    accessorKey: "pass_end_time",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Pass End Time" />
-    ),
-    cell: ({ row }) => {
-      return (
-        <div className="flex space-x-2">
-          <span className="max-w-[500px] truncate font-medium">
-            {row.getValue("pass_end_time")}
-          </span>
-        </div>
-      );
-    },
-  },
-  {
     accessorKey: "pass_time",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Pass Time" />
@@ -100,7 +86,22 @@ export const columns: ColumnDef<Feature>[] = [
       return (
         <div className="flex space-x-2">
           <span className="max-w-[500px] truncate font-medium">
-            {row.getValue("pass_time")}
+            {formatTime(row.getValue("pass_time"))}
+          </span>
+        </div>
+      );
+    },
+  },
+  {
+    accessorKey: "pass_end_time",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Pass End Time" />
+    ),
+    cell: ({ row }) => {
+      return (
+        <div className="flex space-x-2">
+          <span className="max-w-[500px] truncate font-medium">
+            {formatTime(row.getValue("pass_end_time"))}
           </span>
         </div>
       );

@@ -42,6 +42,7 @@ const Page = () => {
 
   const [page, setPage] = useState<number>(1);
   const [pageSize, setPageSize] = useState<number>(10);
+  const [totalPages, setTotalPages] = useState<number>(0);
 
   // Fetch bridge name first
   useEffect(() => {
@@ -49,7 +50,7 @@ const Page = () => {
       try {
         setLoading(true);
         const bridge_options = await get<string[]>("bridges");
-        setSelectedBridge(bridge_options[0]);
+        // setSelectedBridge(bridge_options[0]);
         setBridgeOptions(bridge_options);
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -69,20 +70,20 @@ const Page = () => {
           const point_name_options = await get<string[]>("pointName", {
             bridge: selectedBridge,
           });
-          setSelectedPointName(point_name_options[0]);
+          // setSelectedPointName(point_name_options[0]);
           setPointNameOptions(point_name_options);
 
           const pass_time_option = await get<string[]>("times", {
             bridge: selectedBridge,
           });
-          setSelectedPassTime(pass_time_option[0]);
+          // setSelectedPassTime(pass_time_option[0]);
           setPassTimeOptions(pass_time_option);
 
-          setSelectedPassEndTime(
-            pass_time_option.length > 1
-              ? pass_time_option[1]
-              : pass_time_option[0]
-          );
+          // setSelectedPassEndTime(
+          //   pass_time_option.length > 1
+          //     ? pass_time_option[1]
+          //     : pass_time_option[0]
+          // );
           setPassEndTimeOptions(pass_time_option);
         } catch (error) {
           console.error("Error fetching time options:", error);
@@ -100,12 +101,13 @@ const Page = () => {
         selectedBridge,
         selectedPassTime,
         selectedPointName,
-        selectedPassEndTime
+        selectedPassEndTime,
+        selectedTextModeType
       )
     ) {
       try {
         setLoading(true);
-        const text = await get<Text[]>("text_manage", {
+        const text = await get<{ count: number; data: Text[] }>("text_manage", {
           page: page,
           pageSize: pageSize,
           textModeType: selectedTextModeType,
@@ -115,7 +117,8 @@ const Page = () => {
           pointName: selectedPointName,
         });
 
-        setData(z.array(TextSchema).parse(text));
+        setData(z.array(TextSchema).parse(text.data));
+        setTotalPages(Math.ceil(text.count / pageSize));
       } catch (error) {
         console.error("Error fetching data:", error);
       } finally {
@@ -140,18 +143,10 @@ const Page = () => {
   };
 
   const getAllData = async () => {
-    if (
-      checkParameters(
-        selectedBridge,
-        selectedPassTime,
-        selectedPointName,
-        selectedPassEndTime,
-        selectedTextModeType
-      )
-    ) {
+    if (checkParameters(selectedTextModeType)) {
       try {
         setLoading(true);
-        const text = await get<Text[]>("text_manage", {
+        const text = await get<{ count: number; data: Text[] }>("text_manage", {
           page: page,
           pageSize: pageSize,
           textModeType: selectedTextModeType,
@@ -161,8 +156,8 @@ const Page = () => {
           pointName: "",
         });
 
-        setData(z.array(TextSchema).parse(text));
-        
+        setData(z.array(TextSchema).parse(text.data));
+        setTotalPages(Math.ceil(text.count / pageSize));
       } catch (error) {
         console.error("Error fetching data:", error);
       } finally {
@@ -171,11 +166,36 @@ const Page = () => {
     }
   };
 
-  const handlePageChange = (newPage: number, newPageSize: number) => {
+  const handlePageChange = async (newPage: number, newPageSize: number) => {
     setPage(newPage);
     setPageSize(newPageSize);
+    if (checkParameters(selectedTextModeType)) {
+      try {
+        setLoading(true);
+        const text = await get<{ count: number; data: Text[] }>("text_manage", {
+          page: newPage,
+          pageSize: newPageSize,
+          textModeType: selectedTextModeType,
+          bridgeName: selectedBridge,
+          passTime: selectedPassTime,
+          passEndTime: selectedPassEndTime,
+          pointName: selectedPointName,
+        });
 
-    
+        setData(z.array(TextSchema).parse(text.data));
+        setTotalPages(Math.ceil(text.count / pageSize));
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      } finally {
+        setLoading(false);
+      }
+    } else {
+      toast({
+        variant: "destructive",
+        title: "条件不完整",
+        description: "请选择桥梁、时间、指标",
+      });
+    }
   };
 
   return (
@@ -264,6 +284,7 @@ const Page = () => {
           data={data}
           columns={columns}
           onPageChange={handlePageChange}
+          totalPages={totalPages}
         />
       </div>
     </div>

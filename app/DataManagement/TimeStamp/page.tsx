@@ -40,6 +40,7 @@ const Page = () => {
 
   const [page, setPage] = useState<number>(1);
   const [pageSize, setPageSize] = useState<number>(10);
+  const [totalPages, setTotalPages] = useState<number>(1);
 
   // Fetch bridge name first
   useEffect(() => {
@@ -47,7 +48,7 @@ const Page = () => {
       try {
         setLoading(true);
         const bridge_options = await get<string[]>("bridges");
-        setSelectedBridge(bridge_options[0]);
+        // setSelectedBridge(bridge_options[0]);
         setBridgeOptions(bridge_options);
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -67,20 +68,20 @@ const Page = () => {
           const point_name_options = await get<string[]>("pointName", {
             bridge: selectedBridge,
           });
-          setSelectedPointName(point_name_options[0]);
+          // setSelectedPointName(point_name_options[0]);
           setPointNameOptions(point_name_options);
 
           const pass_time_option = await get<string[]>("times", {
             bridge: selectedBridge,
           });
-          setSelectedPassTime(pass_time_option[0]);
+          // setSelectedPassTime(pass_time_option[0]);
           setPassTimeOptions(pass_time_option);
 
-          setSelectedPassEndTime(
-            pass_time_option.length > 1
-              ? pass_time_option[1]
-              : pass_time_option[0]
-          );
+          // setSelectedPassEndTime(
+          //   pass_time_option.length > 1
+          //     ? pass_time_option[1]
+          //     : pass_time_option[0]
+          // );
           setPassEndTimeOptions(pass_time_option);
         } catch (error) {
           console.error("Error fetching time options:", error);
@@ -96,16 +97,20 @@ const Page = () => {
     if (checkParameters(selectedBridge, selectedPassTime, selectedPointName)) {
       try {
         setLoading(true);
-        const time_stamp = await get<TimeStamp[]>("tsData_manage", {
-          page: page,
-          pageSize: pageSize,
-          bridgeName: selectedBridge,
-          passTime: selectedPassTime,
-          passEndTime: selectedPassEndTime,
-          pointName: selectedPointName,
-        });
+        const time_stamp = await get<{ count: number; data: TimeStamp[] }>(
+          "tsData_manage",
+          {
+            page: page,
+            pageSize: pageSize,
+            bridgeName: selectedBridge,
+            passTime: selectedPassTime,
+            passEndTime: selectedPassEndTime,
+            pointName: selectedPointName,
+          }
+        );
 
-        setData(z.array(TimeStampSchema).parse(time_stamp));
+        setData(z.array(TimeStampSchema).parse(time_stamp.data));
+        setTotalPages(Math.ceil(time_stamp.count / pageSize));
       } catch (error) {
         console.error("Error fetching data:", error);
       } finally {
@@ -129,33 +134,53 @@ const Page = () => {
   };
 
   const getAllData = async () => {
-    if (checkParameters(selectedBridge, selectedPassTime, selectedPointName)) {
-      try {
-        setLoading(true);
-        const time_stamp = await get<TimeStamp[]>("tsData_manage", {
+    try {
+      setLoading(true);
+      const time_stamp = await get<{ count: number; data: TimeStamp[] }>(
+        "tsData_manage",
+        {
           page: page,
           pageSize: pageSize,
           bridgeName: "",
           passTime: "",
           passEndTime: "",
           pointName: "",
-        });
+        }
+      );
 
-        setData(z.array(TimeStampSchema).parse(time_stamp));
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      } finally {
-        setLoading(false);
-      }
+      setData(z.array(TimeStampSchema).parse(time_stamp.data));
+      setTotalPages(Math.ceil(time_stamp.count / pageSize));
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
-  const handlePageChange = (newPage: number, newPageSize: number) => {
+  const handlePageChange = async (newPage: number, newPageSize: number) => {
     setPage(newPage);
     setPageSize(newPageSize);
+    try {
+      setLoading(true);
+      const time_stamp = await get<{ count: number; data: TimeStamp[] }>(
+        "tsData_manage",
+        {
+          page: newPage,
+          pageSize: newPageSize,
+          bridgeName: selectedBridge,
+          passTime: selectedPassTime,
+          passEndTime: selectedPassEndTime,
+          pointName: selectedPointName,
+        }
+      );
 
-    console.log(newPage, newPageSize);
-    
+      setData(z.array(TimeStampSchema).parse(time_stamp.data));
+      setTotalPages(Math.ceil(time_stamp.count / pageSize));
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -200,7 +225,7 @@ const Page = () => {
               ))}
             </SelectContent>
           </Select>
-          
+
           <DateTimePicker
             time_list={passTimeOptions}
             timeChange={setSelectedPassTime}
@@ -226,6 +251,7 @@ const Page = () => {
           data={data}
           columns={columns}
           onPageChange={handlePageChange}
+          totalPages={totalPages}
         />
       </div>
     </div>

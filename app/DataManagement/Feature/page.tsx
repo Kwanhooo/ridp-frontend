@@ -26,9 +26,9 @@ const Page = () => {
   const [selectedBridge, setSelectedBridge] = useState<string>("");
   const [bridgeOptions, setBridgeOptions] = useState<string[]>([]);
 
-  const [selectedFeatureModelType, setSelectedFeatureModelType] =
+  const [selectedFeatureModeType, setSelectedFeatureModeType] =
     useState<string>("矩阵数据");
-  const [featureModelTypeOptions] = useState<string[]>([
+  const [featureModeTypeOptions] = useState<string[]>([
     "矩阵数据",
     "时序图数据",
     "向量数据",
@@ -47,6 +47,7 @@ const Page = () => {
 
   const [page, setPage] = useState<number>(1);
   const [pageSize, setPageSize] = useState<number>(10);
+  const [totalPages, setTotalPages] = useState<number>(1);
 
   // Fetch bridge name first
   useEffect(() => {
@@ -54,7 +55,7 @@ const Page = () => {
       try {
         setLoading(true);
         const bridge_options = await get<string[]>("bridges");
-        setSelectedBridge(bridge_options[0]);
+        // setSelectedBridge(bridge_options[0]);
         setBridgeOptions(bridge_options);
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -74,20 +75,20 @@ const Page = () => {
           const point_name_options = await get<string[]>("pointName", {
             bridge: selectedBridge,
           });
-          setSelectedPointName(point_name_options[0]);
+          // setSelectedPointName(point_name_options[0]);
           setPointNameOptions(point_name_options);
 
           const pass_time_option = await get<string[]>("times", {
             bridge: selectedBridge,
           });
-          setSelectedPassTime(pass_time_option[0]);
+          // setSelectedPassTime(pass_time_option[0]);
           setPassTimeOptions(pass_time_option);
 
-          setSelectedPassEndTime(
-            pass_time_option.length > 1
-              ? pass_time_option[1]
-              : pass_time_option[0]
-          );
+          // setSelectedPassEndTime(
+          //   pass_time_option.length > 1
+          //     ? pass_time_option[1]
+          //     : pass_time_option[0]
+          // );
           setPassEndTimeOptions(pass_time_option);
         } catch (error) {
           console.error("Error fetching time options:", error);
@@ -103,7 +104,7 @@ const Page = () => {
     if (
       checkParameters(
         selectedBridge,
-        selectedFeatureModelType,
+        selectedFeatureModeType,
         selectedPassTime,
         selectedPointName,
         selectedPassEndTime
@@ -111,17 +112,21 @@ const Page = () => {
     ) {
       try {
         setLoading(true);
-        const feature_data = await get<Feature[]>("feature_manage", {
-          page: page,
-          pageSize: pageSize,
-          bridgeName: selectedBridge,
-          featureModelType: selectedFeatureModelType,
-          pointName: selectedPointName,
-          passTime: selectedPassTime,
-          passEndTime: selectedPassEndTime,
-        });
+        const feature_data = await get<{ count: number; data: Feature[] }>(
+          "feature_manage",
+          {
+            page: page,
+            pageSize: pageSize,
+            bridgeName: selectedBridge,
+            featureModeType: selectedFeatureModeType,
+            pointName: selectedPointName,
+            passTime: selectedPassTime,
+            passEndTime: selectedPassEndTime,
+          }
+        );
 
-        setData(z.array(FeatureSchema).parse(feature_data));
+        setData(z.array(FeatureSchema).parse(feature_data.data));
+        setTotalPages(Math.ceil(feature_data.count / pageSize));
       } catch (error) {
         console.error("Error fetching data:", error);
       } finally {
@@ -138,7 +143,7 @@ const Page = () => {
 
   const handleReset = async () => {
     setSelectedBridge("");
-    setSelectedFeatureModelType("");
+    setSelectedFeatureModeType("");
     setSelectedPassTime("");
     setSelectedPassEndTime("");
     setSelectedPointName("");
@@ -146,40 +151,70 @@ const Page = () => {
   };
 
   const getAllData = async () => {
-    if (
-      checkParameters(
-        selectedBridge,
-        selectedFeatureModelType,
-        selectedPassTime,
-        selectedPointName,
-        selectedPassEndTime
-      )
-    ) {
+    if (checkParameters(selectedFeatureModeType)) {
       try {
         setLoading(true);
-        const feature_data = await get<Feature[]>("feature_manage", {
-          page: page,
-          pageSize: pageSize,
-          bridgeName: "",
-          featureModelType: selectedFeatureModelType,
-          pointName: "",
-          passTime: "",
-          passEndTime: "",
-        });
+        const feature_data = await get<{ count: number; data: Feature[] }>(
+          "feature_manage",
+          {
+            page: page,
+            pageSize: pageSize,
+            bridgeName: "",
+            featureModeType: selectedFeatureModeType,
+            pointName: "",
+            passTime: "",
+            passEndTime: "",
+          }
+        );
 
-        setData(z.array(FeatureSchema).parse(feature_data));
+        setData(z.array(FeatureSchema).parse(feature_data.data));
+        setTotalPages(Math.ceil(feature_data.count / pageSize));
       } catch (error) {
         console.error("Error fetching data:", error);
       } finally {
         setLoading(false);
       }
+    } else {
+      toast({
+        variant: "destructive",
+        title: "条件不完整",
+        description: "请选择特征类型",
+      });
     }
   };
 
-  const handlePageChange = (newPage: number, newPageSize: number) => {
+  const handlePageChange = async (newPage: number, newPageSize: number) => {
     setPage(newPage);
     setPageSize(newPageSize);
-    console.log(`Page: ${newPage}, PageSize: ${newPageSize}`);
+    if (checkParameters(selectedFeatureModeType)) {
+      try {
+        setLoading(true);
+        const feature_data = await get<{ count: number; data: Feature[] }>(
+          "feature_manage",
+          {
+            page: newPage,
+            pageSize: newPageSize,
+            bridgeName: selectedBridge,
+            featureModeType: selectedFeatureModeType,
+            pointName: selectedPointName,
+            passTime: selectedPassTime,
+            passEndTime: selectedPassEndTime,
+          }
+        );
+
+        setData(z.array(FeatureSchema).parse(feature_data.data));
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      } finally {
+        setLoading(false);
+      }
+    } else {
+      toast({
+        variant: "destructive",
+        title: "条件不完整",
+        description: "请选择特征类型",
+      });
+    }
   };
 
   return (
@@ -209,15 +244,15 @@ const Page = () => {
           </Select>
 
           <Select
-            value={selectedFeatureModelType}
-            onValueChange={(value) => setSelectedFeatureModelType(value)}
+            value={selectedFeatureModeType}
+            onValueChange={(value) => setSelectedFeatureModeType(value)}
             disabled={loading}
           >
             <SelectTrigger className="w-[180px]">
               <SelectValue placeholder="选择指标" />
             </SelectTrigger>
             <SelectContent>
-              {featureModelTypeOptions.map((option) => (
+              {featureModeTypeOptions.map((option) => (
                 <SelectItem key={option} value={option}>
                   {option}
                 </SelectItem>
@@ -268,6 +303,7 @@ const Page = () => {
           data={data}
           columns={columns}
           onPageChange={handlePageChange}
+          totalPages={totalPages}
         />
       </div>
     </div>
