@@ -49,9 +49,7 @@ const DemoLineChart: React.FC<DemoLineChartProps> = ({bridge, time, type, clear,
     }, [bridge, time, type, refreshSignal]);
 
     React.useEffect(() => {
-        if (clear) {
-            setChartData(initialChartData);
-        }
+        setChartData(initialChartData);
     }, [clear]);
 
     return (
