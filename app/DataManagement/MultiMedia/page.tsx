@@ -5,7 +5,8 @@ import { useEffect, useState } from "react";
 import { MyTable } from "@/components/MyTable";
 import {
   MultiMedia,
-  columns,
+  ImageColumns,
+  VideoColumns,
   MultiMediaSchema,
 } from "@/components/columns/MultiMediaColumn";
 import { z } from "zod";
@@ -28,7 +29,10 @@ const Page = () => {
 
   const [selectedMultimediaModeType, setSelectedMultimediaModeType] =
     useState<string>("图片数据");
-  const [multimediaModeTypeOptions] = useState<string[]>(["图片数据", "视频数据"]);
+  const [multimediaModeTypeOptions] = useState<string[]>([
+    "图片数据",
+    "视频数据",
+  ]);
 
   const [selectedPassTime, setSelectedPassTime] = useState<string>("");
   const [passTimeOptions, setPassTimeOptions] = useState<string[]>([]);
@@ -253,7 +257,11 @@ const Page = () => {
       <div className="h-7/8 p-2">
         <MyTable
           data={data}
-          columns={columns}
+          columns={
+            selectedMultimediaModeType === "视频数据"
+              ? VideoColumns
+              : ImageColumns
+          }
           onPageChange={handlePageChange}
           totalPages={totalPages}
         />
