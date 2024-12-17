@@ -45,14 +45,17 @@ const Page = () => {
   const [page, setPage] = useState<number>(1);
   const [pageSize, setPageSize] = useState<number>(10);
   const [totalPages, setTotalPages] = useState<number>(1);
+  const [trigger, setTrigger] = useState(false);
 
   // Fetch bridge name first
   useEffect(() => {
     const fetch_data = async () => {
       try {
         setLoading(true);
-        const bridge_options = await get<string[]>("bridges");
-        // setSelectedBridge(bridge_options[0]);
+        const [bridge_options] = await Promise.all([
+          get<string[]>("bridges"),
+          getAllData(),
+        ]);
         setBridgeOptions(bridge_options);
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -71,14 +74,8 @@ const Page = () => {
           const pass_time_option = await get<string[]>("times", {
             bridge: selectedBridge,
           });
-          // setSelectedPassTime(pass_time_option[0]);
           setPassTimeOptions(pass_time_option);
 
-          // setSelectedPassEndTime(
-          //   pass_time_option.length > 1
-          //     ? pass_time_option[1]
-          //     : pass_time_option[0]
-          // );
           setPassEndTimeOptions(pass_time_option);
         } catch (error) {
           console.error("Error fetching time options:", error);
@@ -91,41 +88,31 @@ const Page = () => {
   }, [selectedBridge]);
 
   const handleQuery = async () => {
-    if (
-      checkParameters(
-        selectedBridge,
-        selectedMultimediaModeType,
-        selectedPassTime,
-        selectedPassEndTime
-      )
-    ) {
-      try {
-        setLoading(true);
-        const multi_media = await get<{ count: number; data: MultiMedia[] }>(
-          "multimedia_manage",
-          {
-            page: page,
-            pageSize: pageSize,
-            bridgeName: selectedBridge,
-            multimediaModeType: selectedMultimediaModeType,
-            passTime: selectedPassTime,
-            passEndTime: selectedPassEndTime,
-          }
-        );
-
-        setData(z.array(MultiMediaSchema).parse(multi_media.data));
-        setTotalPages(Math.ceil(multi_media.count / pageSize));
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      } finally {
-        setLoading(false);
-      }
-    } else {
+    try {
+      setLoading(true);
+      const multi_media = await get<{ count: number; data: MultiMedia[] }>(
+        "multimedia_manage",
+        {
+          page: 1,
+          pageSize: pageSize,
+          bridgeName: selectedBridge,
+          multimediaModeType: selectedMultimediaModeType,
+          passTime: selectedPassTime,
+          passEndTime: selectedPassEndTime,
+        }
+      );
+      setPage(1);
+      setTrigger(!trigger);
+      setData(z.array(MultiMediaSchema).parse(multi_media.data));
+      setTotalPages(Math.ceil(multi_media.count / pageSize));
+    } catch (error) {
       toast({
         variant: "destructive",
-        title: "条件不完整",
-        description: "请选择桥梁、多模态类型、时间、指标",
+        title: "网络错误",
+        description: "请重置参数后重新请求",
       });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -249,9 +236,6 @@ const Page = () => {
           <Button variant="outline" onClick={handleReset} disabled={loading}>
             重置选择
           </Button>
-          <Button variant="outline" onClick={getAllData} disabled={loading}>
-            全部数据
-          </Button>
         </div>
       </div>
       <div className="h-7/8 p-2">
@@ -264,6 +248,7 @@ const Page = () => {
           }
           onPageChange={handlePageChange}
           totalPages={totalPages}
+          trigger={trigger}
         />
       </div>
     </div>

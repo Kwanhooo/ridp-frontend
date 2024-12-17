@@ -30,6 +30,7 @@ interface DataTableProps<TData, TValue> {
   data: TData[];
   onPageChange: (pageIndex: number, pageSize: number) => void;
   totalPages: number;
+  trigger: boolean;
 }
 
 export function MyTable<TData, TValue>({
@@ -37,6 +38,7 @@ export function MyTable<TData, TValue>({
   data,
   onPageChange,
   totalPages,
+  trigger,
 }: DataTableProps<TData, TValue>) {
   const [rowSelection, setRowSelection] = React.useState({});
   const [columnVisibility, setColumnVisibility] =
@@ -122,7 +124,7 @@ export function MyTable<TData, TValue>({
           </TableBody>
         </Table>
       </div>
-      <Pagination table={table} onPageChange={onPageChange} />
+      <Pagination table={table} onPageChange={onPageChange} trigger={trigger} />
     </div>
   );
 }

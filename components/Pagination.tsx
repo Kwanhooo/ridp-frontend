@@ -14,20 +14,27 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useEffect } from "react";
 
 interface DataTablePaginationProps<TData> {
   table: Table<TData>;
   onPageChange: (pageIndex: number, pageSize: number) => void;
+  trigger: boolean;
 }
 
 export function Pagination<TData>({
   table,
   onPageChange,
+  trigger,
 }: DataTablePaginationProps<TData>) {
   const handlePageChange = (pageIndex: number) => {
     table.setPageIndex(pageIndex);
     onPageChange(pageIndex + 1, table.getState().pagination.pageSize);
   };
+
+  useEffect(() => {
+    table.setPageIndex(0); // Reset page index when trigger changes
+  }, [trigger]);
 
   return (
     <div className="flex items-center justify-between px-2">

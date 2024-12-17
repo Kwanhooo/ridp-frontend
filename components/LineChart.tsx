@@ -24,7 +24,6 @@ import {
 } from "@/components/ui/select";
 
 import { useEffect, useState } from "react";
-import { GitCommitVertical } from "lucide-react";
 
 type OriginalChartData = {
   title: string;
@@ -363,7 +362,7 @@ export function ChartWithTable({
           </LineChart>
         </ChartContainer>
         {table_data && (
-          <div className="w-full overflow-y-auto">
+          <div className="w-full overflow-y-auto flex items-center justify-center">
             <table className="w-full">
               <thead>
                 <tr className="m-0 border-t p-0 even:bg-muted">
@@ -468,7 +467,6 @@ export function BigLineChart({
   anomalyOptions,
   detection_index,
 }: BigLineChartProps) {
-  
   return (
     <Card className="h-full w-full">
       <CardHeader className="flex flex-col items-stretch space-y-0 border-b p-0 sm:flex-row h-1/4">
@@ -616,16 +614,16 @@ export function BigLineChart({
               strokeWidth={2}
               dot={({ cx, cy, payload, index }) => {
                 if (detection_index && index in detection_index) {
-                  const r = 24;
+                  const r = 18; // 圆圈的半径
                   return (
-                    <GitCommitVertical
+                    <circle
                       key={payload.month}
-                      x={cx - r / 2}
-                      y={cy - r / 2}
-                      width={r}
-                      height={r}
-                      fill={chartConfig.value.color}
+                      cx={cx}
+                      cy={cy}
+                      r={r / 2} // 半径
+                      fill="none"
                       stroke={chartConfig.value.color}
+                      strokeWidth={2} // 边框宽度
                     />
                   );
                 } else {
@@ -633,6 +631,17 @@ export function BigLineChart({
                 }
               }}
             />
+            {title === "异常值检测" && !detection_index && (
+              <text
+                x="85%" // 设置水平位置为右上角
+                y="20%" // 设置垂直位置为右上角
+                textAnchor="end" // 文本右对齐
+                fontSize={36} // 字体大小
+                fill="black" // 文本颜色
+              >
+                无异常
+              </text>
+            )}
           </LineChart>
         </ChartContainer>
       </CardContent>

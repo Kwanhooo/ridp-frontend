@@ -71,7 +71,7 @@ export const columns: ColumnDef<Feature>[] = [
     ),
     cell: ({ row }) => {
       return (
-        <div className="max-w-[500px] truncate font-medium">
+        <div className="max-w-[1000px] truncate font-medium">
           {row.getValue("metrics")}
         </div>
       );

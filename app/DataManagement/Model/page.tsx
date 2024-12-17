@@ -41,13 +41,17 @@ const Page = () => {
   const [page, setPage] = useState<number>(1);
   const [pageSize, setPageSize] = useState<number>(10);
   const [totalPages, setTotalPages] = useState<number>(1);
+  const [trigger, setTrigger] = useState(false);
 
   // Fetch bridge name first
   useEffect(() => {
     const fetch_data = async () => {
       try {
         setLoading(true);
-        const bridge_options = await get<string[]>("bridges");
+        const [bridge_options] = await Promise.all([
+          get<string[]>("bridges"),
+          getAllData(),
+        ]);
         // setSelectedBridge(bridge_options[0]);
         setBridgeOptions(bridge_options);
       } catch (error) {
@@ -68,7 +72,6 @@ const Page = () => {
           const point_name_options = await get<string[]>("pointName", {
             bridge: selectedBridge,
           });
-          // setSelectedPointName(point_name_options[0]);
           setPointNameOptions(point_name_options);
         } catch (error) {
           console.error("Error fetching time options:", error);
@@ -105,40 +108,30 @@ const Page = () => {
   };
 
   const handleQuery = async () => {
-    if (
-      checkParameters(
-        selectedBridge,
-        selectedModelType,
-        selectedModelName,
-        selectedPointName
-      )
-    ) {
-      try {
-        setLoading(true);
-        const model_data = await get<{ count: number; data: Model[] }>(
-          "model_manage",
-          {
-            page: page,
-            pageSize: pageSize,
-            modelType: selectedModelType,
-            modelName: selectedModelName,
-            pointName: selectedPointName,
-          }
-        );
-
-        setData(z.array(ModelSchema).parse(model_data.data));
-        setTotalPages(Math.ceil(model_data.count / pageSize));
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      } finally {
-        setLoading(false);
-      }
-    } else {
+    try {
+      setLoading(true);
+      const model_data = await get<{ count: number; data: Model[] }>(
+        "model_manage",
+        {
+          page: 1,
+          pageSize: pageSize,
+          modelType: selectedModelType,
+          modelName: selectedModelName,
+          pointName: selectedPointName,
+        }
+      );
+      setPage(1);
+      setTrigger(!trigger);
+      setData(z.array(ModelSchema).parse(model_data.data));
+      setTotalPages(Math.ceil(model_data.count / pageSize));
+    } catch (error) {
       toast({
         variant: "destructive",
-        title: "条件不完整",
-        description: "请选择桥梁、模型、指标",
+        title: "网络错误",
+        description: "请重置参数后重新请求",
       });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -256,9 +249,6 @@ const Page = () => {
           <Button variant="outline" onClick={handleReset} disabled={loading}>
             重置选择
           </Button>
-          <Button variant="outline" onClick={getAllData} disabled={loading}>
-            全部数据
-          </Button>
         </div>
       </div>
       <div className="h-7/8 p-2">
@@ -267,6 +257,7 @@ const Page = () => {
           columns={columns}
           onPageChange={handlePageChange}
           totalPages={totalPages}
+          trigger={trigger}
         />
       </div>
     </div>

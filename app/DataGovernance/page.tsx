@@ -96,7 +96,7 @@ const Page = () => {
       try {
         setLoading(true);
         const bridge_options = await get<string[]>("bridges");
-        setSelectedBridge(bridge_options[0]);
+        // setSelectedBridge(bridge_options[0]);
         setBridgeOptions(bridge_options);
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -116,13 +116,13 @@ const Page = () => {
           const time_options = await get<string[]>("times", {
             bridge: selectedBridge,
           });
-          setSelectedTime(time_options[0]);
+          // setSelectedTime(time_options[0]);
           setTimeOptions(time_options);
 
           const metric_options = await get<string[]>("pointName", {
             bridge: selectedBridge,
           });
-          setSelectedMetric(metric_options[0]);
+          // setSelectedMetric(metric_options[0]);
           setMetricOptions(metric_options);
         } catch (error) {
           console.error("Error fetching time options:", error);

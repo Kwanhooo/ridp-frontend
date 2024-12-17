@@ -38,17 +38,21 @@ const Page = () => {
 
   const [data, setData] = useState<TimeStamp[]>([]);
 
-  const [page, setPage] = useState<number>(1);
+  const [, setPage] = useState<number>(1);
   const [pageSize, setPageSize] = useState<number>(10);
   const [totalPages, setTotalPages] = useState<number>(1);
+
+  const [trigger, setTrigger] = useState(false);
 
   // Fetch bridge name first
   useEffect(() => {
     const fetch_data = async () => {
       try {
         setLoading(true);
-        const bridge_options = await get<string[]>("bridges");
-        // setSelectedBridge(bridge_options[0]);
+        const [bridge_options] = await Promise.all([
+          get<string[]>("bridges"),
+          getAllData(),
+        ]);
         setBridgeOptions(bridge_options);
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -68,20 +72,12 @@ const Page = () => {
           const point_name_options = await get<string[]>("pointName", {
             bridge: selectedBridge,
           });
-          // setSelectedPointName(point_name_options[0]);
-          setPointNameOptions(point_name_options);
 
+          setPointNameOptions(point_name_options);
           const pass_time_option = await get<string[]>("times", {
             bridge: selectedBridge,
           });
-          // setSelectedPassTime(pass_time_option[0]);
           setPassTimeOptions(pass_time_option);
-
-          // setSelectedPassEndTime(
-          //   pass_time_option.length > 1
-          //     ? pass_time_option[1]
-          //     : pass_time_option[0]
-          // );
           setPassEndTimeOptions(pass_time_option);
         } catch (error) {
           console.error("Error fetching time options:", error);
@@ -91,37 +87,37 @@ const Page = () => {
       }
     };
     fetch_point_name_options();
+    setSelectedPassTime("");
+    setSelectedPassEndTime("");
+    setSelectedPointName("");
   }, [selectedBridge]);
 
   const handleQuery = async () => {
-    if (checkParameters(selectedBridge, selectedPassTime, selectedPointName)) {
-      try {
-        setLoading(true);
-        const time_stamp = await get<{ count: number; data: TimeStamp[] }>(
-          "tsData_manage",
-          {
-            page: page,
-            pageSize: pageSize,
-            bridgeName: selectedBridge,
-            passTime: selectedPassTime,
-            passEndTime: selectedPassEndTime,
-            pointName: selectedPointName,
-          }
-        );
-
-        setData(z.array(TimeStampSchema).parse(time_stamp.data));
-        setTotalPages(Math.ceil(time_stamp.count / pageSize));
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      } finally {
-        setLoading(false);
-      }
-    } else {
+    try {
+      setLoading(true);
+      const time_stamp = await get<{ count: number; data: TimeStamp[] }>(
+        "tsData_manage",
+        {
+          page: 1,
+          pageSize: pageSize,
+          bridgeName: selectedBridge,
+          passTime: selectedPassTime,
+          passEndTime: selectedPassEndTime,
+          pointName: selectedPointName,
+        }
+      );
+      setPage(1);
+      setTrigger(!trigger);
+      setData(z.array(TimeStampSchema).parse(time_stamp.data));
+      setTotalPages(Math.ceil(time_stamp.count / pageSize));
+    } catch (error) {
       toast({
         variant: "destructive",
-        title: "条件不完整",
-        description: "请选择桥梁、时间、指标",
+        title: "网络错误",
+        description: "请重置参数后重新请求",
       });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -130,7 +126,6 @@ const Page = () => {
     setSelectedPassTime("");
     setSelectedPassEndTime("");
     setSelectedPointName("");
-    // setData([]);
   };
 
   const getAllData = async () => {
@@ -139,7 +134,7 @@ const Page = () => {
       const time_stamp = await get<{ count: number; data: TimeStamp[] }>(
         "tsData_manage",
         {
-          page: page,
+          page: 1,
           pageSize: pageSize,
           bridgeName: "",
           passTime: "",
@@ -147,7 +142,6 @@ const Page = () => {
           pointName: "",
         }
       );
-
       setData(z.array(TimeStampSchema).parse(time_stamp.data));
       setTotalPages(Math.ceil(time_stamp.count / pageSize));
     } catch (error) {
@@ -160,6 +154,7 @@ const Page = () => {
   const handlePageChange = async (newPage: number, newPageSize: number) => {
     setPage(newPage);
     setPageSize(newPageSize);
+    console.log(newPage, newPageSize, selectedBridge);
     try {
       setLoading(true);
       const time_stamp = await get<{ count: number; data: TimeStamp[] }>(
@@ -238,11 +233,8 @@ const Page = () => {
           <Button onClick={handleQuery} disabled={loading}>
             {loading ? "Loading..." : "查询"}
           </Button>
-          <Button variant="outline" onClick={handleReset} disabled={loading}>
+          <Button onClick={handleReset} disabled={loading}>
             重置选择
-          </Button>
-          <Button variant="outline" onClick={getAllData} disabled={loading}>
-            全部数据
           </Button>
         </div>
       </div>
@@ -252,6 +244,7 @@ const Page = () => {
           columns={columns}
           onPageChange={handlePageChange}
           totalPages={totalPages}
+          trigger={trigger}
         />
       </div>
     </div>

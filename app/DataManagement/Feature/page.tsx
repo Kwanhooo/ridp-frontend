@@ -48,14 +48,17 @@ const Page = () => {
   const [page, setPage] = useState<number>(1);
   const [pageSize, setPageSize] = useState<number>(10);
   const [totalPages, setTotalPages] = useState<number>(1);
+  const [trigger, setTrigger] = useState(false);
 
   // Fetch bridge name first
   useEffect(() => {
     const fetch_data = async () => {
       try {
         setLoading(true);
-        const bridge_options = await get<string[]>("bridges");
-        // setSelectedBridge(bridge_options[0]);
+        const [bridge_options] = await Promise.all([
+          get<string[]>("bridges"),
+          getAllData(),
+        ]);
         setBridgeOptions(bridge_options);
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -101,43 +104,32 @@ const Page = () => {
   }, [selectedBridge]);
 
   const handleQuery = async () => {
-    if (
-      checkParameters(
-        selectedBridge,
-        selectedFeatureModeType,
-        selectedPassTime,
-        selectedPointName,
-        selectedPassEndTime
-      )
-    ) {
-      try {
-        setLoading(true);
-        const feature_data = await get<{ count: number; data: Feature[] }>(
-          "feature_manage",
-          {
-            page: page,
-            pageSize: pageSize,
-            bridgeName: selectedBridge,
-            featureModeType: selectedFeatureModeType,
-            pointName: selectedPointName,
-            passTime: selectedPassTime,
-            passEndTime: selectedPassEndTime,
-          }
-        );
-
-        setData(z.array(FeatureSchema).parse(feature_data.data));
-        setTotalPages(Math.ceil(feature_data.count / pageSize));
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      } finally {
-        setLoading(false);
-      }
-    } else {
+    try {
+      setLoading(true);
+      const feature_data = await get<{ count: number; data: Feature[] }>(
+        "feature_manage",
+        {
+          page: 1,
+          pageSize: pageSize,
+          bridge_name: selectedBridge,
+          featureModeType: selectedFeatureModeType,
+          pointName: selectedPointName,
+          passTime: selectedPassTime,
+          passEndTime: selectedPassEndTime,
+        }
+      );
+      setPage(1);
+      setTrigger(!trigger);
+      setData(z.array(FeatureSchema).parse(feature_data.data));
+      setTotalPages(Math.ceil(feature_data.count / pageSize));
+    } catch (error) {
       toast({
         variant: "destructive",
-        title: "条件不完整",
-        description: "请选择桥梁、特征类型、时间、指标",
+        title: "网络错误",
+        description: "请重置参数后重新请求",
       });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -159,7 +151,7 @@ const Page = () => {
           {
             page: page,
             pageSize: pageSize,
-            bridgeName: "",
+            bridge_name: "",
             featureModeType: selectedFeatureModeType,
             pointName: "",
             passTime: "",
@@ -194,7 +186,7 @@ const Page = () => {
           {
             page: newPage,
             pageSize: newPageSize,
-            bridgeName: selectedBridge,
+            bridge_name: selectedBridge,
             featureModeType: selectedFeatureModeType,
             pointName: selectedPointName,
             passTime: selectedPassTime,
@@ -293,9 +285,6 @@ const Page = () => {
           <Button variant="outline" onClick={handleReset} disabled={loading}>
             重置选择
           </Button>
-          <Button variant="outline" onClick={getAllData} disabled={loading}>
-            全部数据
-          </Button>
         </div>
       </div>
       <div className="h-7/8 p-2">
@@ -304,6 +293,7 @@ const Page = () => {
           columns={columns}
           onPageChange={handlePageChange}
           totalPages={totalPages}
+          trigger={trigger}
         />
       </div>
     </div>
