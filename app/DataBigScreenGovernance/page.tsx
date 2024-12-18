@@ -454,7 +454,7 @@ const Page = () => {
         </div>
       </div>
       <div className="h-full grid grid-cols-2">
-        <div className="grid grid-rows-3 gap-4 p-2 w-full">
+        <div className="grid grid-rows-3 gap-4 p-2 w-full max-h-[640px]">
           <ChartWithTable
             original_data={originChartData}
             table_data={cleanResult}

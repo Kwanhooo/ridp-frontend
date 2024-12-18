@@ -18,6 +18,14 @@ const MonitorPage = () => {
         {
             url: "https://monitor.ridp.0xcafebabe.cn/video?proName=guidao&chanName=FB1667544_1",
             name: "武广高铁行将山1号隧道工点"
+        },
+        {
+            url: "https://monitor.ridp.0xcafebabe.cn/video?proName=guidao&chanName=AK0868423_1",
+            name: "武广高铁路基摄像头"
+        },
+        {
+            url: "https://monitor.ridp.0xcafebabe.cn/video?proName=guidao&chanName=FQ9566853_1",
+            name: "某客运专线大桥摄像头"
         }
     ];
 
@@ -41,6 +49,22 @@ const MonitorPage = () => {
 
             <div className="flex justify-between gap-6">
                 {liveStream.slice(2, 4).map((obj, index) => (
+                    <div key={index} className="w-1/2 rounded-lg overflow-hidden">
+                        <div className="text-xl font-bold mb-1">{obj.name}</div>
+                        <iframe
+                            src={obj.url}
+                            width="100%"
+                            height="400"
+                            allow="autoplay; fullscreen"
+                            title={`Monitor Video ${index + 3}`}
+                            className="rounded-lg"
+                        ></iframe>
+                    </div>
+                ))}
+            </div>
+
+            <div className="flex justify-between gap-6">
+                {liveStream.slice(4, 6).map((obj, index) => (
                     <div key={index} className="w-1/2 rounded-lg overflow-hidden">
                         <div className="text-xl font-bold mb-1">{obj.name}</div>
                         <iframe
