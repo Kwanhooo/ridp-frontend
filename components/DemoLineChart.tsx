@@ -29,6 +29,8 @@ const DemoLineChart: React.FC<DemoLineChartProps> = ({bridge, time, type, clear,
     const [chartData, setChartData] = React.useState(initialChartData);
 
     React.useEffect(() => {
+        console.log('refreshSignal:', type);
+
         const refreshChartData = async () => {
             if (!bridge || !time || !type) return;
 
@@ -43,10 +45,8 @@ const DemoLineChart: React.FC<DemoLineChartProps> = ({bridge, time, type, clear,
             }
         };
 
-        if (refreshSignal) {
-            refreshChartData();
-        }
-    }, [bridge, time, type, refreshSignal]);
+        refreshChartData();
+    }, [refreshSignal]);
 
     React.useEffect(() => {
         setChartData(initialChartData);

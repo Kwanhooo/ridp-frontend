@@ -98,20 +98,25 @@ const DataMonitor = () => {
     const [pageSize] = React.useState(6);
     const [total, setTotal] = React.useState(0);
     const [refreshSignal, setRefreshSignal] = React.useState<boolean>(false); // 控制子组件刷新
-    const [clearSignal, setClearhSignal] = React.useState<boolean>(false); // 控制子组件清空
+    const [clearSignal, setClearSignal] = React.useState<boolean>(false); // 控制子组件清空
 
     // 加载分页表格数据
     const fetchTableData = async () => {
+        setData([]);  // 清空数据
         try {
             const tableData = await fetchData<TrainPassingResponse>('/train_passing', {
                 bridge: selectedBridge,
-                pass_time: selectedStartTime.replace('T', ' '),
-                pass_end_time: selectedEndTime.replace('T', ' '),
+                pass_time: selectedStartTime ? selectedStartTime.replace('T', ' ') + ':00' : '',
+                pass_end_time: selectedEndTime ? selectedEndTime.replace('T', ' ') + ':00' : '',
                 page,
                 pageSize,
             });
             setTotal(tableData.count);
-            setData(tableData.data);
+            if (tableData.data) {
+                setData(tableData.data);
+            } else {
+                setData([])
+            }
         } catch (error) {
             console.error("加载表格数据失败", error);
         }
@@ -126,6 +131,10 @@ const DataMonitor = () => {
     const nextPage = () => {
         setPage(page + 1);
     };
+
+    // 是否可以翻页
+    const getCanPreviousPage = () => page > 1;
+    const getCanNextPage = () => page < Math.ceil(total / pageSize);
 
     // 跳转到指定页
     const handlePageChange = (pageIndex: number) => {
@@ -148,7 +157,7 @@ const DataMonitor = () => {
 
     // 选择桥梁时更新数据
     const handleDetailClicked = async (row: Row<DataColumn>) => {
-        setClearhSignal(!clearSignal);
+        setClearSignal(!clearSignal);
         const rowData = row.original;
         setSelectedDetailRow(rowData);
         setSelectedBridge(rowData.bridge_name);
@@ -160,6 +169,7 @@ const DataMonitor = () => {
             setVideo(res.video_url)
         })
 
+        console.log("选择的行数据", rowData);
         // 请求 pointName 数据
         try {
             const pointName = await fetchData<TypeListResponse>('/pointName', {bridge: rowData.bridge_name});
@@ -271,20 +281,6 @@ const DataMonitor = () => {
         }
         fetchBridges()
     }, [])
-
-    // 立即加载类型数据
-    React.useEffect(() => {
-        const fetchPointName = async () => {
-            try {
-                const pointName = await fetchData<TypeListResponse>('/pointName', {bridge: selectedDetailRow ? selectedDetailRow.bridge_name : ''});
-                setPointNameOptions(pointName);
-            } catch (error) {
-                console.error("加载类型失败", error);
-            }
-        };
-        fetchPointName();
-
-    }, [selectedDetailRow]);
 
     // 立即加载表格分页数据
     React.useEffect(() => {
@@ -413,7 +409,7 @@ const DataMonitor = () => {
                             <div className="flex flex-row space-x-6">
                                 {/* 页码显示 */}
                                 <div className="flex items-center text-sm font-medium">
-                                    第 {table.getState().pagination.pageIndex + 1} 页&nbsp;&nbsp;&nbsp;&nbsp;共{" "}
+                                    第 {page} 页&nbsp;&nbsp;&nbsp;&nbsp;共{" "}
                                     {Math.ceil(total / pageSize)} 页
                                 </div>
 
@@ -422,8 +418,8 @@ const DataMonitor = () => {
                                     <Button
                                         variant="outline"
                                         size="sm"
-                                        onClick={() => handlePageChange(0)}
-                                        disabled={!table.getCanPreviousPage()}
+                                        onClick={() => handlePageChange(1)}
+                                        disabled={!getCanPreviousPage()}
                                     >
                                         <ChevronsLeft/>
                                     </Button>
@@ -431,7 +427,7 @@ const DataMonitor = () => {
                                         variant="outline"
                                         size="sm"
                                         onClick={() => previousPage()}
-                                        disabled={!table.getCanPreviousPage()}
+                                        disabled={!getCanPreviousPage()}
                                     >
                                         <ChevronLeft/>
                                     </Button>
@@ -439,15 +435,15 @@ const DataMonitor = () => {
                                         variant="outline"
                                         size="sm"
                                         onClick={() => nextPage()}
-                                        disabled={!table.getCanNextPage()}
+                                        disabled={!getCanNextPage()}
                                     >
                                         <ChevronRight/>
                                     </Button>
                                     <Button
                                         variant="outline"
                                         size="sm"
-                                        onClick={() => handlePageChange(table.getPageCount() - 1)}
-                                        disabled={!table.getCanNextPage()}
+                                        onClick={() => handlePageChange(Math.ceil(total / pageSize))}
+                                        disabled={!getCanNextPage()}
                                     >
                                         <ChevronsRight/>
                                     </Button>
