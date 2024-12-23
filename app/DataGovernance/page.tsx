@@ -1,14 +1,9 @@
 // pages/page3.tsx
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
-import {
-  // OriginalLineChart,
-  // HandledLineChart,
-  BigLineChart,
-  ChartWithTable,
-} from "@/components/LineChart";
+import { BigLineChart, ChartWithTable } from "@/components/LineChart";
 import { get } from "../utils/HttpAxios";
 import { checkParameters } from "@/app/utils/util";
 import {
@@ -22,6 +17,7 @@ import { DateTimePicker } from "@/components/DateTimePicker";
 import { Button } from "@/components/ui/button";
 
 import { useToast } from "@/hooks/use-toast";
+import { formatTime } from "@/app/utils/util";
 
 type ChartData = {
   time: string;
@@ -90,18 +86,40 @@ const Page = () => {
   const [anomalyFilling, setAnomalyFilling] = useState<ChartData[]>([]);
   const [missingFilling, setMissingFilling] = useState<ChartData[]>([]);
 
+  const cache = useRef(false);
   // Fetch data from the API
   useEffect(() => {
     const fetch_data = async () => {
       try {
         setLoading(true);
         const bridge_options = await get<string[]>("bridges");
-        // setSelectedBridge(bridge_options[0]);
+
+        const [time_options, metric_options] = await Promise.all([
+          get<string[]>("times", {
+            bridge: bridge_options[0],
+          }),
+          get<string[]>("pointName", {
+            bridge: bridge_options[0],
+          }),
+        ]);
+
+        // 确保只调用一次 handleQuery
+        if (!cache.current) {
+          cache.current = true; // 标记已经调用过 handleQuery
+          await handleQuery(
+            bridge_options[0],
+            formatTime(time_options[0]),
+            metric_options[0]
+          );
+          setLoading(false);
+        }
         setBridgeOptions(bridge_options);
+        
+
       } catch (error) {
         console.error("Error fetching data:", error);
       } finally {
-        setLoading(false);
+        // setLoading(false);
       }
     };
     fetch_data();
@@ -134,8 +152,15 @@ const Page = () => {
     fetch_time_options();
   }, [selectedBridge]);
 
-  const handleQuery = async () => {
-    if (checkParameters(selectedBridge, selectedTime, selectedMetric)) {
+  const handleQuery = async (
+    bridge?: string,
+    time?: string,
+    metric?: string
+  ) => {
+    bridge = bridge || selectedBridge;
+    time = time || selectedTime;
+    metric = metric || selectedMetric;
+    if (checkParameters(bridge, time, metric)) {
       try {
         setLoading(true);
         const [
@@ -148,49 +173,49 @@ const Page = () => {
           missingFillingResponse,
         ] = await Promise.all([
           get<ChartData[]>("metrics", {
-            bridge: selectedBridge,
-            time: selectedTime,
-            pointName: selectedMetric,
+            bridge,
+            time,
+            pointName: metric,
           }),
           get<{ result: CleanResponse; status: string }>("data_process/clean", {
-            bridge: selectedBridge,
-            time: selectedTime,
-            pointName: selectedMetric,
+            bridge,
+            time,
+            pointName: metric,
             modelName: cleanModelType,
           }),
           get<ResponseData>("data_process/cut", {
-            bridge: selectedBridge,
-            time: selectedTime,
-            pointName: selectedMetric,
+            bridge,
+            time,
+            pointName: metric,
             modelName: cutModelType,
           }),
           get<ResponseData>("data_process/filter", {
-            bridge: selectedBridge,
-            time: selectedTime,
-            pointName: selectedMetric,
+            bridge,
+            time,
+            pointName: metric,
             modelName: filterModelType,
           }),
           get<{
             result: DetectionResponse;
             status: string;
           }>("data_process/anomaly_detection", {
-            bridge: selectedBridge,
-            time: selectedTime,
-            pointName: selectedMetric,
+            bridge,
+            time,
+            pointName: metric,
             modelName: anomalyDetectionModelName,
             modelType: anomalyDetectionType,
           }),
           get<ResponseData>("data_process/anomaly_filling", {
-            bridge: selectedBridge,
-            time: selectedTime,
-            pointName: selectedMetric,
+            bridge,
+            time,
+            pointName: metric,
             modelName: anomalyFillingModelName,
             modelType: anomalyFillingType,
           }),
           get<ResponseData>("data_process/missing_filling", {
-            bridge: selectedBridge,
-            time: selectedTime,
-            pointName: selectedMetric,
+            bridge,
+            time,
+            pointName: metric,
             modelName: missingFillingModelName,
             modelType: missingFillingType,
           }),
@@ -265,7 +290,6 @@ const Page = () => {
           });
 
           setCutChartData(cutResult.data);
-          
         } catch {
           console.log("error");
         } finally {
@@ -432,7 +456,12 @@ const Page = () => {
             </SelectContent>
           </Select>
 
-          <Button onClick={handleQuery} disabled={loading}>
+          <Button
+            onClick={() => {
+              handleQuery();
+            }}
+            disabled={loading}
+          >
             {loading ? "Loading..." : "查询"}
           </Button>
           <Button variant="outline" onClick={handleReset} disabled={loading}>
