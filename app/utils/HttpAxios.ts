@@ -1,7 +1,7 @@
 import axios, {AxiosError, AxiosInstance, AxiosResponse} from "axios";
 
 const instance: AxiosInstance = axios.create({
-    baseURL: "http://49.235.111.245:24671/api/ridp", // 部署后端
+    baseURL: "http://49.235.111.245:24673/api/ridp", // 部署后端
     // baseURL: "https://api.ridp.0xcafebabe.cn/api/ridp", // 部署后端的SSL反向代理
     timeout: 1000000, // 请求超时时间
     headers: {

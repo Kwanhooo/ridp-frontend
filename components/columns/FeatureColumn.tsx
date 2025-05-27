@@ -1,4 +1,5 @@
 import { ColumnDef } from "@tanstack/react-table";
+import Image from "next/image";
 
 import { Checkbox } from "@/components/ui/checkbox";
 
@@ -21,9 +22,10 @@ import { formatTime } from "@/app/utils/util";
 
 export const FeatureSchema = z.object({
   bridge_name: z.string(),
-  metrics: z.string(),
+  metrics: z.string().optional(),
   pass_end_time: z.string(),
   pass_time: z.string(),
+  tsPicURL: z.string().optional(),
 });
 
 export type Feature = z.infer<typeof FeatureSchema>;
@@ -70,9 +72,23 @@ export const columns: ColumnDef<Feature>[] = [
       <DataTableColumnHeader column={column} title="Metrics" />
     ),
     cell: ({ row }) => {
+      const model = row.original;
+      const metricsVal = row.getValue("metrics");
       return (
         <div className="max-w-[1000px] truncate font-medium">
-          {row.getValue("metrics")}
+          {metricsVal !== undefined && <div>{String(metricsVal)}</div>}
+          {typeof model.tsPicURL !== "undefined" &&
+            (model.tsPicURL.trim() === "" ? (
+              <div>无图片数据</div>
+            ) : (
+              <Image
+                src={model.tsPicURL}
+                alt="外部图片"
+                width={100}
+                height={56}
+                className="object-contain"
+              />
+            ))}
         </div>
       );
     },

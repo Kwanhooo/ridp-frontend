@@ -123,6 +123,7 @@ const Page = () => {
       setData(z.array(FeatureSchema).parse(feature_data.data));
       setTotalPages(Math.ceil(feature_data.count / pageSize));
     } catch (error) {
+      console.log("Error fetching data:", error);
       toast({
         variant: "destructive",
         title: "网络错误",
