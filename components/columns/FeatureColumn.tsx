@@ -25,7 +25,7 @@ export const FeatureSchema = z.object({
   metrics: z.string().optional(),
   pass_end_time: z.string(),
   pass_time: z.string(),
-  tsPicURL: z.string().optional(),
+  tsPicURL: z.string().optional().nullable(),
 });
 
 export type Feature = z.infer<typeof FeatureSchema>;
@@ -76,8 +76,11 @@ export const columns: ColumnDef<Feature>[] = [
       const metricsVal = row.getValue("metrics");
       return (
         <div className="max-w-[1000px] truncate font-medium">
-          {metricsVal !== undefined && <div>{String(metricsVal)}</div>}
-          {typeof model.tsPicURL !== "undefined" &&
+          {metricsVal ? (
+            <div>{String(metricsVal)}</div>
+          ) : (
+            typeof model.tsPicURL !== "undefined" &&
+            model.tsPicURL !== null &&
             (model.tsPicURL.trim() === "" ? (
               <div>无图片数据</div>
             ) : (
@@ -88,7 +91,8 @@ export const columns: ColumnDef<Feature>[] = [
                 height={56}
                 className="object-contain"
               />
-            ))}
+            ))
+          )}
         </div>
       );
     },
