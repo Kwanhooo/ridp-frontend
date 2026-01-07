@@ -87,7 +87,7 @@ const Page = () => {
   const [missingFilling, setMissingFilling] = useState<ChartData[]>([]);
 
   const cache = useRef(false);
-  const skipInitialBridgeFetch = useRef<string | null>(null);
+  const skipInitialBridgeFetch = useRef(false);
   // Fetch data from the API
   useEffect(() => {
     const fetch_data = async () => {
@@ -115,7 +115,7 @@ const Page = () => {
 
         setTimeOptions(time_options);
         setMetricOptions(metric_options);
-        skipInitialBridgeFetch.current = initialBridge;
+        skipInitialBridgeFetch.current = true;
         setSelectedBridge(initialBridge);
         setSelectedTime(initialTime);
         setSelectedMetric(initialMetric);
@@ -138,8 +138,8 @@ const Page = () => {
   useEffect(() => {
     const fetch_time_options = async () => {
       if (selectedBridge && selectedBridge !== "") {
-        if (skipInitialBridgeFetch.current === selectedBridge) {
-          skipInitialBridgeFetch.current = null;
+        if (skipInitialBridgeFetch.current) {
+          skipInitialBridgeFetch.current = false;
           return;
         }
         try {
