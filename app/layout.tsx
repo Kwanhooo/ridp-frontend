@@ -1,5 +1,6 @@
 import type {Metadata} from "next";
 import localFont from "next/font/local";
+import {Suspense} from "react";
 import "./globals.css";
 import NavigationLayout from "@/components/NavigationLayout";
 import {ReduxProvider} from "@/store";
@@ -41,7 +42,15 @@ export default function RootLayout({
             {children}
           </main>
         </SidebarProvider> */}
-            <NavigationLayout>{children}</NavigationLayout>
+            <Suspense
+                fallback={
+                    <div className="flex h-screen">
+                        <main className="flex-1 transition-all duration-300">{children}</main>
+                    </div>
+                }
+            >
+                <NavigationLayout>{children}</NavigationLayout>
+            </Suspense>
         </ReduxProvider>
         <Toaster />
         </body>

@@ -1,7 +1,7 @@
 "use client";
 import React, {useEffect, useState} from "react";
 import Link from "next/link";
-import {usePathname} from "next/navigation";
+import {usePathname, useSearchParams} from "next/navigation";
 import {AppDispatch} from "@/store";
 import {selectSidebar, toggleSidebar} from "@/store/modules/sidebarSlice";
 import {useDispatch, useSelector} from "react-redux";
@@ -16,6 +16,8 @@ const NavigationLayout = ({children}: { children: React.ReactNode }) => {
     const [selectedPage, setSelectedPage] = useState("");
 
     const pathname = usePathname();
+    const searchParams = useSearchParams();
+    const hideSidebar = searchParams.get("hide") === "true";
 
     useEffect(() => {
         setSelectedPage(pathname);
@@ -59,192 +61,194 @@ const NavigationLayout = ({children}: { children: React.ReactNode }) => {
     return (
         <div className="flex h-screen">
             {/* 侧边栏 */}
-            <aside
-                className={`${isSidebarOpen ? "w-64" : "w-16"} bg-gray-800 text-white p-5 transition-all duration-300 ease-in-out border-r-[1px] border-gray-700`}
-            >
-                {/* 顶部按钮 */}
-                <div className="flex justify-between items-center mb-6">
-                    <button onClick={toggle} className="text-white focus:outline-none">
-                        {!isSidebarOpen ? (
-                            <svg
-                                className="w-6 h-6"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                                xmlns="http://www.w3.org/2000/svg"
-                            >
-                                <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth="2"
-                                    d="M4 6h16M4 12h16m-7 6h7"
-                                ></path>
-                            </svg>
-                        ) : (
-                            <svg
-                                className="w-6 h-6"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                                xmlns="http://www.w3.org/2000/svg"
-                            >
-                                <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth="2"
-                                    d="M6 18L18 6M6 6l12 12"
-                                ></path>
-                            </svg>
-                        )}
-                    </button>
-                </div>
+            {!hideSidebar && (
+                <aside
+                    className={`${isSidebarOpen ? "w-64" : "w-16"} bg-gray-800 text-white p-5 transition-all duration-300 ease-in-out border-r-[1px] border-gray-700`}
+                >
+                    {/* 顶部按钮 */}
+                    <div className="flex justify-between items-center mb-6">
+                        <button onClick={toggle} className="text-white focus:outline-none">
+                            {!isSidebarOpen ? (
+                                <svg
+                                    className="w-6 h-6"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                >
+                                    <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth="2"
+                                        d="M4 6h16M4 12h16m-7 6h7"
+                                    ></path>
+                                </svg>
+                            ) : (
+                                <svg
+                                    className="w-6 h-6"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                >
+                                    <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth="2"
+                                        d="M6 18L18 6M6 6l12 12"
+                                    ></path>
+                                </svg>
+                            )}
+                        </button>
+                    </div>
 
-                {/* 侧边栏导航，使用 map 动态生成页面链接 */}
-                <nav>
-                    <ul>
-                        {pages.map((page, index) => (
-                            <li key={index} className="mb-4">
-                                {page.name === "数据管理" ? (
-                                    <>
-                                        <button
-                                            onClick={toggleDataManagement}
-                                            className={`text-lg font-semibold text-white w-full text-left ${
+                    {/* 侧边栏导航，使用 map 动态生成页面链接 */}
+                    <nav>
+                        <ul>
+                            {pages.map((page, index) => (
+                                <li key={index} className="mb-4">
+                                    {page.name === "数据管理" ? (
+                                        <>
+                                            <button
+                                                onClick={toggleDataManagement}
+                                                className={`text-lg font-semibold text-white w-full text-left ${
+                                                    !isSidebarOpen && "hidden"
+                                                }`}
+                                            >
+                                                <div
+                                                    className={`hover:bg-blue-500 transition-all px-4 py-1 rounded-lg flex justify-between items-center ${
+                                                        selectedPage === page.path && "bg-blue-500"
+                                                    }`}
+                                                >
+                          <span className="whitespace-nowrap overflow-hidden text-ellipsis">
+                            {page.name}
+                          </span>
+                                                    <svg
+                                                        className={`w-4 h-4 transition-transform duration-300 ${
+                                                            isDataManagementOpen ? "transform rotate-180" : ""
+                                                        }`}
+                                                        fill="none"
+                                                        stroke="currentColor"
+                                                        viewBox="0 0 24 24"
+                                                        xmlns="http://www.w3.org/2000/svg"
+                                                    >
+                                                        <path
+                                                            strokeLinecap="round"
+                                                            strokeLinejoin="round"
+                                                            strokeWidth="2"
+                                                            d="M19 9l-7 7-7-7"
+                                                        ></path>
+                                                    </svg>
+                                                </div>
+                                            </button>
+                                            {isDataManagementOpen && (
+                                                <ul className="pl-4 mt-2">
+                                                    {dataManagementOptions.map((option, optionIndex) => (
+                                                        <li key={optionIndex} className="mb-2">
+                                                            <Link
+                                                                href={option.path}
+                                                                className={`text-base font-semibold text-white ${
+                                                                    !isSidebarOpen && "hidden"
+                                                                }`}
+                                                            >
+                                                                <div
+                                                                    className={`hover:bg-blue-500 transition-all px-4 py-1 rounded-lg ${
+                                                                        selectedPage === option.path && "bg-blue-500"
+                                                                    }`}
+                                                                >
+                                  <span className="whitespace-nowrap overflow-hidden text-ellipsis">
+                                    {option.name}
+                                  </span>
+                                                                </div>
+                                                            </Link>
+                                                        </li>
+                                                    ))}
+                                                </ul>
+                                            )}
+                                        </>
+                                    ) : page.name === "实时监控" ? (
+                                        <>
+                                            <button
+                                                onClick={toggleMonitoring}
+                                                className={`text-lg font-semibold text-white w-full text-left ${
+                                                    !isSidebarOpen && "hidden"
+                                                }`}
+                                            >
+                                                <div
+                                                    className={`hover:bg-blue-500 transition-all px-4 py-1 rounded-lg flex justify-between items-center ${
+                                                        selectedPage === page.path && "bg-blue-500"
+                                                    }`}
+                                                >
+                          <span className="whitespace-nowrap overflow-hidden text-ellipsis">
+                            {page.name}
+                          </span>
+                                                    <svg
+                                                        className={`w-4 h-4 transition-transform duration-300 ${
+                                                            isMonitoringOpen ? "transform rotate-180" : ""
+                                                        }`}
+                                                        fill="none"
+                                                        stroke="currentColor"
+                                                        viewBox="0 0 24 24"
+                                                        xmlns="http://www.w3.org/2000/svg"
+                                                    >
+                                                        <path
+                                                            strokeLinecap="round"
+                                                            strokeLinejoin="round"
+                                                            strokeWidth="2"
+                                                            d="M19 9l-7 7-7-7"
+                                                        ></path>
+                                                    </svg>
+                                                </div>
+                                            </button>
+                                            {isMonitoringOpen && (
+                                                <ul className="pl-4 mt-2">
+                                                    {monitoringOptions.map((option, optionIndex) => (
+                                                        <li key={optionIndex} className="mb-2">
+                                                            <Link
+                                                                href={option.path}
+                                                                className={`text-base font-semibold text-white ${
+                                                                    !isSidebarOpen && "hidden"
+                                                                }`}
+                                                            >
+                                                                <div
+                                                                    className={`hover:bg-blue-500 transition-all px-4 py-1 rounded-lg ${
+                                                                        selectedPage === option.path && "bg-blue-500"
+                                                                    }`}
+                                                                >
+                                  <span className="whitespace-nowrap overflow-hidden text-ellipsis">
+                                    {option.name}
+                                  </span>
+                                                                </div>
+                                                            </Link>
+                                                        </li>
+                                                    ))}
+                                                </ul>
+                                            )}
+                                        </>
+                                    ) : (
+                                        <Link
+                                            href={page.path}
+                                            className={`text-lg font-semibold text-white ${
                                                 !isSidebarOpen && "hidden"
                                             }`}
                                         >
                                             <div
-                                                className={`hover:bg-blue-500 transition-all px-4 py-1 rounded-lg flex justify-between items-center ${
+                                                className={`hover:bg-blue-500 transition-all px-4 py-1 rounded-lg ${
                                                     selectedPage === page.path && "bg-blue-500"
                                                 }`}
                                             >
                         <span className="whitespace-nowrap overflow-hidden text-ellipsis">
                           {page.name}
                         </span>
-                                                <svg
-                                                    className={`w-4 h-4 transition-transform duration-300 ${
-                                                        isDataManagementOpen ? "transform rotate-180" : ""
-                                                    }`}
-                                                    fill="none"
-                                                    stroke="currentColor"
-                                                    viewBox="0 0 24 24"
-                                                    xmlns="http://www.w3.org/2000/svg"
-                                                >
-                                                    <path
-                                                        strokeLinecap="round"
-                                                        strokeLinejoin="round"
-                                                        strokeWidth="2"
-                                                        d="M19 9l-7 7-7-7"
-                                                    ></path>
-                                                </svg>
                                             </div>
-                                        </button>
-                                        {isDataManagementOpen && (
-                                            <ul className="pl-4 mt-2">
-                                                {dataManagementOptions.map((option, optionIndex) => (
-                                                    <li key={optionIndex} className="mb-2">
-                                                        <Link
-                                                            href={option.path}
-                                                            className={`text-base font-semibold text-white ${
-                                                                !isSidebarOpen && "hidden"
-                                                            }`}
-                                                        >
-                                                            <div
-                                                                className={`hover:bg-blue-500 transition-all px-4 py-1 rounded-lg ${
-                                                                    selectedPage === option.path && "bg-blue-500"
-                                                                }`}
-                                                            >
-                                <span className="whitespace-nowrap overflow-hidden text-ellipsis">
-                                  {option.name}
-                                </span>
-                                                            </div>
-                                                        </Link>
-                                                    </li>
-                                                ))}
-                                            </ul>
-                                        )}
-                                    </>
-                                ) : page.name === "实时监控" ? (
-                                    <>
-                                        <button
-                                            onClick={toggleMonitoring}
-                                            className={`text-lg font-semibold text-white w-full text-left ${
-                                                !isSidebarOpen && "hidden"
-                                            }`}
-                                        >
-                                            <div
-                                                className={`hover:bg-blue-500 transition-all px-4 py-1 rounded-lg flex justify-between items-center ${
-                                                    selectedPage === page.path && "bg-blue-500"
-                                                }`}
-                                            >
-                        <span className="whitespace-nowrap overflow-hidden text-ellipsis">
-                          {page.name}
-                        </span>
-                                                <svg
-                                                    className={`w-4 h-4 transition-transform duration-300 ${
-                                                        isMonitoringOpen ? "transform rotate-180" : ""
-                                                    }`}
-                                                    fill="none"
-                                                    stroke="currentColor"
-                                                    viewBox="0 0 24 24"
-                                                    xmlns="http://www.w3.org/2000/svg"
-                                                >
-                                                    <path
-                                                        strokeLinecap="round"
-                                                        strokeLinejoin="round"
-                                                        strokeWidth="2"
-                                                        d="M19 9l-7 7-7-7"
-                                                    ></path>
-                                                </svg>
-                                            </div>
-                                        </button>
-                                        {isMonitoringOpen && (
-                                            <ul className="pl-4 mt-2">
-                                                {monitoringOptions.map((option, optionIndex) => (
-                                                    <li key={optionIndex} className="mb-2">
-                                                        <Link
-                                                            href={option.path}
-                                                            className={`text-base font-semibold text-white ${
-                                                                !isSidebarOpen && "hidden"
-                                                            }`}
-                                                        >
-                                                            <div
-                                                                className={`hover:bg-blue-500 transition-all px-4 py-1 rounded-lg ${
-                                                                    selectedPage === option.path && "bg-blue-500"
-                                                                }`}
-                                                            >
-                                <span className="whitespace-nowrap overflow-hidden text-ellipsis">
-                                  {option.name}
-                                </span>
-                                                            </div>
-                                                        </Link>
-                                                    </li>
-                                                ))}
-                                            </ul>
-                                        )}
-                                    </>
-                                ) : (
-                                    <Link
-                                        href={page.path}
-                                        className={`text-lg font-semibold text-white ${
-                                            !isSidebarOpen && "hidden"
-                                        }`}
-                                    >
-                                        <div
-                                            className={`hover:bg-blue-500 transition-all px-4 py-1 rounded-lg ${
-                                                selectedPage === page.path && "bg-blue-500"
-                                            }`}
-                                        >
-                      <span className="whitespace-nowrap overflow-hidden text-ellipsis">
-                        {page.name}
-                      </span>
-                                        </div>
-                                    </Link>
-                                )}
-                            </li>
-                        ))}
-                    </ul>
-                </nav>
-            </aside>
+                                        </Link>
+                                    )}
+                                </li>
+                            ))}
+                        </ul>
+                    </nav>
+                </aside>
+            )}
 
             {/* 内容区域 */}
             <main className="flex-1 transition-all duration-300">{children}</main>
